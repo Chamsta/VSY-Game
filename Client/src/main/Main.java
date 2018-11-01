@@ -5,7 +5,7 @@ import java.rmi.registry.Registry;
 
 import javax.swing.JOptionPane;
 
-import intface.Echo;
+import de.vsy.interfaces.Echo;
 
 
 public class Main {

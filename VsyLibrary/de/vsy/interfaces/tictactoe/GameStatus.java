@@ -1,4 +1,4 @@
-package tictactoe;
+package de.vsy.interfaces.tictactoe;
 
 /**
  * @author Gladis

@@ -1,4 +1,4 @@
-package intface;
+package de.vsy.interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
