@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 import de.vsy.interfaces.Echo;
 
 
-public class Main {
+public class Main { //Client
 
 	public static void main(String[] args) {
 		JOptionPane.showMessageDialog(null, "Ich bin dein Client.");

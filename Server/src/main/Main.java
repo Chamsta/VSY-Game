@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import de.vsy.interfaces.Echo;
 
 
-public class Main implements Echo{
+public class Main implements Echo{ //Server
 
 	public static void main(String[] args) {
 		System.out.println("Server startet. Wenn es mal programmiert wurde...");
