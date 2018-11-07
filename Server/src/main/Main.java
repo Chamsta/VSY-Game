@@ -9,6 +9,7 @@ import intface.Echo;
 
 
 public class Main implements Echo{
+	private static Registry registry;
 
 	public static void main(String[] args) {
 		System.out.println("Server startet. Wenn es mal programmiert wurde...");
@@ -17,13 +18,14 @@ public class Main implements Echo{
 			Echo stub = (Echo) UnicastRemoteObject.exportObject(obj, 0);
 
             // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.getRegistry();
+            registry = LocateRegistry.getRegistry();
             registry.bind("Echo", stub);
 
             System.err.println("Server ready");
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
+            System.exit(0);
         }
 	}
 
