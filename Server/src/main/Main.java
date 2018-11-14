@@ -5,6 +5,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import dbconnect.DBConnection;
 import de.vsy.interfaces.Echo;
 
 
@@ -43,5 +44,12 @@ public class Main implements Echo{ //Server
 	@Override
 	public String echoThis(String text) throws RemoteException {
 		return "Echo " + text;
+	}
+
+	@Override
+	public String sqlQuery(String query) throws RemoteException {
+		DBConnection dbConnection = new DBConnection();
+		String test = dbConnection.execute(query);
+		return test;
 	}
 }

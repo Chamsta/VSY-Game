@@ -2,8 +2,8 @@ package main;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Scanner;
 
-import javax.swing.JOptionPane;
 
 import de.vsy.interfaces.Echo;
 
@@ -24,6 +24,11 @@ public class Main { //Client
             Echo stub = (Echo) registry.lookup("Echo");
             String response = stub.echoThis("Hallo Du da.");
             System.out.println("response: " + response);
+            
+            System.out.println("SQL Statement angeben:");
+            String sql = new Scanner(System.in).nextLine();
+            response = stub.sqlQuery(sql);
+            System.out.println(response);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();

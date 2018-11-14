@@ -5,4 +5,5 @@ import java.rmi.RemoteException;
 
 public interface Echo extends Remote{
 	String echoThis(String text) throws RemoteException;
+	String sqlQuery(String query) throws RemoteException;
 }
