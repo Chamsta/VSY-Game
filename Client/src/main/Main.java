@@ -11,10 +11,15 @@ import de.vsy.interfaces.Echo;
 public class Main { //Client
 
 	public static void main(String[] args) {
-		JOptionPane.showMessageDialog(null, "Ich bin dein Client.");
+		System.out.println("Ich bin dein Client.");
 		String host = (args.length < 1) ? null : args[0];
+		if(host == null){
+			System.out.println("Bitte Adresse des Servers angeben!");
+			System.exit(0);
+		}
 		System.out.println(host);
         try {
+        	System.setSecurityManager(new SecurityManager());
             Registry registry = LocateRegistry.getRegistry(host);
             Echo stub = (Echo) registry.lookup("Echo");
             String response = stub.echoThis("Hallo Du da.");
