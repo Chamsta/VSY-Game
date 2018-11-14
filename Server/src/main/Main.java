@@ -25,8 +25,11 @@ public class Main implements Echo{ //Server
 			Main obj = new Main();
 			Echo stub = (Echo) UnicastRemoteObject.exportObject(obj, 0);
 
-            // Bind the remote object's stub in the registry
+			// Starts the RMI Registry
+			LocateRegistry.createRegistry(Registry.REGISTRY_PORT); //Port binden
+			// Bind the remote object's stub in the registry
             registry = LocateRegistry.getRegistry();
+
             registry.bind("Echo", stub);
 
             System.err.println("Server ready!");
