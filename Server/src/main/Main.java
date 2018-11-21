@@ -7,6 +7,8 @@ import java.rmi.server.UnicastRemoteObject;
 
 import dbconnect.DBConnection;
 import de.vsy.interfaces.Echo;
+import de.vsy.interfaces.ServerInterface;
+import objects.Server;
 
 
 public class Main implements Echo{ //Server
@@ -21,18 +23,21 @@ public class Main implements Echo{ //Server
 		}
 		System.out.println("Server startet auf Adresse: " + host);
 		try {
+        	//Beim Starten aus Eclipse den vollständigen Pfad zu security.policy eingeben!
+			System.setProperty("java.security.policy", "security.policy");
 			System.setSecurityManager(new SecurityManager());
 			System.setProperty("java.rmi.server.hostname",host);
+			LocateRegistry.createRegistry(Registry.REGISTRY_PORT); 
+			registry = LocateRegistry.getRegistry();
+			
 			Main obj = new Main();
-			Echo stub = (Echo) UnicastRemoteObject.exportObject(obj, 0);
-
-			// Starts the RMI Registry
-			LocateRegistry.createRegistry(Registry.REGISTRY_PORT); //Port binden
-			// Bind the remote object's stub in the registry
-            registry = LocateRegistry.getRegistry();
+			Echo stub = (Echo) UnicastRemoteObject.exportObject(obj,0);
+			
+			Server server = new Server(registry);
+			ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server,0);
 
             registry.bind("Echo", stub);
-
+            registry.bind("Server", serverStub);
             System.err.println("Server ready!");
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
