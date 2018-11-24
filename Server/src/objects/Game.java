@@ -47,7 +47,73 @@ public class Game implements GameInterface {
 	public int getId(){
 		return this.id;
 	}
-
+	
+	// Loop through all cells of the board and if one is found to be null then return false.
+    // Otherwise the board is full.
+	public boolean isBoardFull() throws RemoteException {
+        boolean isFull = true; 
+        HashMap<String, Boolean> board = loadCells();
+        int bLength = board.size();
+        for (int i = 0; i < bLength; i++) {
+            for (int j = 0; j < bLength; j++) {
+                if (board.get(String.format("%d,%d", i, j)) == null) {
+                    isFull = false;
+                    break;
+                }
+            }
+            if(!isFull){
+            	break;
+            }
+        }         
+        return isFull;
+    }
+	 
+    // Check to see if all three values are the same (and not null) indicating a win.
+    private boolean checkRowCol(Boolean c1, Boolean c2, Boolean c3) {
+        return ((c1 != null) && (c1 == c2) && (c2 == c3));
+    }
+     
+    // Loop through rows and see if any are winners.
+    private boolean checkRowsForWin(int currentRow) throws RemoteException { 
+    	HashMap<String, Boolean> board = loadCells();
+        int bLength = board.size();
+        for (int i = 0; i < bLength - 2; i++) {
+            if (checkRowCol(board.get(String.format("%d,%d", currentRow, i)), 
+            				board.get(String.format("%d,%d", currentRow, i + 1)), 
+            				board.get(String.format("%d,%d", currentRow, i + 2)))) {
+                return true;
+            }
+        }
+        return false;
+    }
+     
+    // Loop through columns and see if any are winners.
+    private boolean checkColumnsForWin(int currentCol) throws RemoteException {
+    	HashMap<String, Boolean> board = loadCells();
+        int bLength = board.size();
+        for (int i = 0; i < bLength - 2; i++) {
+            if (checkRowCol(board.get(String.format("%d,%d", i, currentCol)), 
+            				board.get(String.format("%d,%d", i + 1, currentCol)), 
+            				board.get(String.format("%d,%d", i + 2, currentCol)))) {
+                return true;
+            }
+        }
+        return false;
+    }
+ 
+    // Check the two diagonals to see if either is a win. Return true if either wins.
+    private boolean checkDiagonalsForWin(int currentRow, int currentCol) {
+    	return false;
+    }
+    
+    // Returns true if there is a win, false otherwise.
+    // This calls our other win check functions to check the entire board.
+    public boolean checkForWin(int currentRow, int currentCol) throws RemoteException {
+        return (checkRowsForWin(currentRow) || 
+        		checkColumnsForWin(currentCol) || 
+        		checkDiagonalsForWin(currentRow, currentCol));
+    }
+     
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#getCells()
 	 */
