@@ -21,7 +21,9 @@ public class Game implements GameInterface {
 	private String nextPlayer;
 	private String player1;
 	private String player2;	
-	private GameStatus status;	
+	private GameStatus status;
+	private GameInterface gameClient1;
+	private GameInterface gameClient2;
 	
 	/**
 	 * 
@@ -36,8 +38,6 @@ public class Game implements GameInterface {
 	public Game(int id, int size){
 		this.id = id;
 		this.gameSize = size < DEFAULT_GAME_SIZE ? DEFAULT_GAME_SIZE : size;
-		this.status = GameStatus.None;
-		this.nextPlayer = "";
 	}
 	
 	public void setId(int id){
@@ -109,7 +109,21 @@ public class Game implements GameInterface {
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage());
 		}
-		return true;
+		checkGameEnd();
+		return value;
+	}
+	
+	private void checkGameEnd() throws RemoteException {
+		boolean end = true;
+		for(Boolean val : getCells().values()){
+			if(val == null) {
+				end = false;
+				break;
+			}
+		}
+		if(end) {
+			Stop();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -130,6 +144,13 @@ public class Game implements GameInterface {
 			posX = -1;
 			posY = -1;
 		}
+		if(getGameClient1() != null) {
+			gameClient1.setCell(key, value);
+		}
+		if(getGameClient2() != null) {
+			gameClient2.setCell(key, value);
+		}
+		SwitchPlayer();
 		return this.setCell(posX, posY, value);
 	}
 	
@@ -162,7 +183,14 @@ public class Game implements GameInterface {
 	 */
 	@Override
 	public String getNextPlayer() throws RemoteException {
-		return this.nextPlayer;
+		try {
+			this.nextPlayer = Server.dbConnection.getNextPlayer(id);
+			if(this.nextPlayer == null && this.player2 != null)
+				setNextPlayer(player1);
+			return this.nextPlayer;
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
 	}
 
 	/* (non-Javadoc)
@@ -171,6 +199,17 @@ public class Game implements GameInterface {
 	@Override
 	public void setNextPlayer(String nextPlayer) throws RemoteException {
 		this.nextPlayer = nextPlayer;
+		try {
+			Server.dbConnection.setNextPlayer(id, this.nextPlayer);
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
+		if(getGameClient1() != null){
+			gameClient1.setNextPlayer(this.nextPlayer);
+		}
+		if(getGameClient2() != null) {
+			gameClient2.setNextPlayer(this.nextPlayer);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -178,7 +217,11 @@ public class Game implements GameInterface {
 	 */
 	@Override
 	public String getPlayer1() throws RemoteException {
-		return this.player1;
+		try {
+			return this.player1 = Server.dbConnection.getPlayer1(id);
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
 	}
 
 	/* (non-Javadoc)
@@ -187,6 +230,10 @@ public class Game implements GameInterface {
 	@Override
 	public void setPlayer1(String value) throws RemoteException {
 		this.player1 = value;
+		if(getGameClient1() != null)
+			gameClient1.setPlayer1(value);
+		if(getGameClient2() != null)
+			gameClient2.setPlayer1(value);
 	}
 
 	/* (non-Javadoc)
@@ -194,7 +241,11 @@ public class Game implements GameInterface {
 	 */
 	@Override
 	public String getPlayer2() throws RemoteException {
-		return this.player2;
+		try {
+			return this.player2 = Server.dbConnection.getPlayer2(id);
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
 	}
 
 	/* (non-Javadoc)
@@ -203,6 +254,10 @@ public class Game implements GameInterface {
 	@Override
 	public void setPlayer2(String value) throws RemoteException {
 		this.player2 = value;
+		if(getGameClient1() != null)
+			gameClient1.setPlayer2(value);
+		if(getGameClient2() != null)
+			gameClient2.setPlayer2(value);
 	}
 
 	/* (non-Javadoc)
@@ -219,6 +274,11 @@ public class Game implements GameInterface {
 	@Override
 	public void setStatus(GameStatus status) throws RemoteException {
 		this.status = status;
+		try {
+			Server.dbConnection.setStatus(id, status);
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
 	}
 	
 	public HashMap<String, Boolean> getInitCells(){
@@ -232,16 +292,30 @@ public class Game implements GameInterface {
 		return cells;
 	}
 	
+	private GameInterface getGameClient1() throws RemoteException {
+		if(gameClient1 != null)
+			return gameClient1;
+		gameClient1 = Server.getClientGame(getPlayer1());
+		return gameClient1;
+	}
+	
+	private GameInterface getGameClient2() throws RemoteException {
+		if(gameClient2 != null)
+			return gameClient2;
+		gameClient2 = Server.getClientGame(getPlayer2());
+		return gameClient2;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#Play()
 	 */
 	@Override
 	public void Play() throws RemoteException{
-		if(this.player1.isEmpty() || this.player2.isEmpty())
+		if(this.player1 == null || this.player1.isEmpty() || this.player2 == null || this.player2.isEmpty())
 			return;
-		while(this.status.equals(GameStatus.Running)){
-			
-		}
+		setNextPlayer(player1);
+		setStatus(GameStatus.Running);
+		checkGameEnd();
 	}
 	
 	/* (non-Javadoc)
@@ -249,7 +323,17 @@ public class Game implements GameInterface {
 	 */
 	@Override
 	public void Stop() throws RemoteException{
-		this.status = GameStatus.Terminated;
+		setStatus(GameStatus.Terminated);
+		setNextPlayer(null);
+		if(getGameClient1() != null) {
+			gameClient1.Stop();
+		}
+		if(getGameClient2() != null) {
+			gameClient2.Stop();
+		}
+		Server.removeClientGame(player1);
+		Server.removeClientGame(player2);
+		Server.removeGame(id);
 	}
 	
 	/* (non-Javadoc)
@@ -257,8 +341,9 @@ public class Game implements GameInterface {
 	 */
 	@Override
 	public void SwitchPlayer() throws RemoteException{
-		
+		this.nextPlayer = getNextPlayer();
 		this.nextPlayer = this.nextPlayer.equals(this.player1) ? this.player2 : this.player1;
+		setNextPlayer(nextPlayer);
 	}
 	
 }
