@@ -16,12 +16,15 @@ public class Game implements GameInterface {
 	 */
 	private static final long serialVersionUID = -293274928239420221L;
 	static int DEFAULT_GAME_SIZE = 3;
+	static int GAME_SIZE_MAX = 10;
+	static int GAME_WIN_TIMES = 3;
 	private int id;
 	private int gameSize;
 	private String nextPlayer;
 	private String player1;
 	private String player2;	
-	private GameStatus status;	
+	private GameStatus status;
+	private int winTimes;
 	
 	/**
 	 * 
@@ -36,8 +39,10 @@ public class Game implements GameInterface {
 	public Game(int id, int size){
 		this.id = id;
 		this.gameSize = size < DEFAULT_GAME_SIZE ? DEFAULT_GAME_SIZE : size;
+		this.gameSize = size > GAME_SIZE_MAX ? GAME_SIZE_MAX : size;
 		this.status = GameStatus.None;
 		this.nextPlayer = "";
+		this.winTimes = 0;
 	}
 	
 	public void setId(int id){
@@ -174,9 +179,11 @@ public class Game implements GameInterface {
     // Returns true if there is a win, false otherwise.
     // This calls our other win check functions to check the entire board.
     public boolean checkForWin(int currentRow, int currentCol) throws RemoteException {
-        return (checkRowsForWin(currentRow) || 
-        		checkColumnsForWin(currentCol) || 
-        		checkDiagonalsForWin(currentRow, currentCol));
+        return ((checkRowsForWin(currentRow) || 
+        			checkColumnsForWin(currentCol) || 
+        			checkDiagonalsForWin(currentRow, currentCol)) &&
+        		((this.winTimes == GAME_SIZE_MAX && this.gameSize > DEFAULT_GAME_SIZE)|| 
+        				(this.gameSize == DEFAULT_GAME_SIZE)));
     }
      
 	/* (non-Javadoc)
