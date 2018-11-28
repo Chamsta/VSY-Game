@@ -102,8 +102,73 @@ public class Game implements GameInterface {
     }
  
     // Check the two diagonals to see if either is a win. Return true if either wins.
-    private boolean checkDiagonalsForWin(int currentRow, int currentCol) {
-    	return false;
+    private boolean checkDiagonalsForWin(int currentRow, int currentCol) throws RemoteException {
+    	HashMap<String, Boolean> board = loadCells();
+        int bLength = board.size();
+    	boolean checked = false;
+    	int beginOffsetRow = 0;
+    	int beginOffsetCol = 0;
+    	int endOffsetRow = 0;
+    	int endOffsetCol = 0;
+    	// Diagonal back slash
+    	beginOffsetRow = currentRow - 2;
+    	beginOffsetCol = currentCol - 2;
+    	endOffsetRow = currentRow + 2;
+    	endOffsetCol = currentCol + 2;
+    	for(int offset = 2; offset > 0; offset--)
+	    	if((currentRow - offset < 0) || (currentCol - offset < 0)){
+	    		beginOffsetRow++;
+	    		beginOffsetCol++;
+    		}
+    	
+    	for(int offset = 2; offset > 0; offset--)
+	    	if((currentRow + offset >= bLength) || (currentCol + offset >= bLength)){
+	    		endOffsetRow--;
+	    		endOffsetCol--;
+	    	}
+    	
+    	if(endOffsetRow - beginOffsetRow > 1){
+	    	for (int i = 0; i < endOffsetCol - beginOffsetRow; i++) {
+	            if ((beginOffsetRow + i + 2) < bLength &&
+	            		(beginOffsetCol + i + 2) < bLength &&
+            			checkRowCol(board.get(String.format("%d,%d", beginOffsetRow + i, beginOffsetCol + i)), 
+	            				board.get(String.format("%d,%d", beginOffsetRow + i + 1, beginOffsetCol + i + 1)), 
+	            				board.get(String.format("%d,%d", beginOffsetRow + i + 2, beginOffsetCol + i + 2)))) {
+	            	checked = true;
+	            }
+	        }
+    	}
+    	
+    	// Diagonal slash
+    	beginOffsetRow = currentRow + 2;
+    	beginOffsetCol = currentCol - 2;
+    	endOffsetRow = currentRow - 2;
+    	endOffsetCol = currentCol + 2;
+    	for(int offset = 2; offset > 0; offset--)
+	    	if((currentCol - offset < 0) || (currentRow + offset >= bLength)){
+	    		beginOffsetRow--;
+	    		beginOffsetCol++;
+    		}
+    	
+    	for(int offset = 2; offset > 0; offset--)
+	    	if((currentCol + offset >= bLength) || (currentRow - offset < 0)){
+	    		endOffsetRow++;
+	    		endOffsetCol--;
+	    	}
+    	
+    	if(beginOffsetRow - endOffsetRow > 1){
+	    	for (int i = 0; i < endOffsetCol - beginOffsetCol -1; i++) {
+	            if ((beginOffsetRow - i - 2) >= endOffsetRow &&
+	            		(beginOffsetCol + i + 2) <= endOffsetCol &&
+	            		checkRowCol(board.get(String.format("%d,%d", beginOffsetRow - i, beginOffsetCol + i)), 
+	            				board.get(String.format("%d,%d", beginOffsetRow - i - 1, beginOffsetCol + i + 1)), 
+	            				board.get(String.format("%d,%d", beginOffsetRow - i - 2, beginOffsetCol + i + 2)))) {
+	            	checked = true;
+	            }
+	        }
+    	}    	
+    	
+    	return checked;
     }
     
     // Returns true if there is a win, false otherwise.
