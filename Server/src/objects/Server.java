@@ -1,5 +1,7 @@
 package objects;
 
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -58,12 +60,13 @@ public class Server implements ServerInterface {
 		Game game = new Game(-1);
 		game.setPlayer1(user);
 		game.setStatus(GameStatus.Waiting);
-		dbConnection.insertNewGame(game);
+		dbConnection.insertNewGame(game, user);
 		try {
 			String reg ="Game" + game.getId();
 			GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
 			registry.bind(reg, gameStub);
 			System.out.println("Registered " + reg);
+			game.Play();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
@@ -77,14 +80,51 @@ public class Server implements ServerInterface {
 		GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
 		registry.rebind(reg, gameStub);
 		System.out.println("Registered " + reg);
+		game.Play();
 	}
 	
 	private Integer findWaitingGame(String user) throws Exception {
 		Game game = dbConnection.findWaitingGame(user);
 		if(game != null) {
+			game.setPlayer2(user);
 			registerGame(game.getId());
 			return game.getId();
 		}
 		return null;
+	}
+	
+	public static GameInterface getClientGame(String user) {
+		try {
+			GameInterface gameClient = (GameInterface) registry.lookup("GameClient" + user);
+			return gameClient;
+		} catch (AccessException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+		}
+		return null;
+	}
+	
+	public static void removeGame(int gameId) {
+		try {
+			registry.unbind("Game" + gameId);
+		} catch (AccessException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+		}
+	}
+	
+	public static void removeClientGame(String user) {
+		try {
+			registry.unbind("GameClient" + user);
+		} catch (AccessException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+		}
 	}
 }

@@ -85,10 +85,10 @@ public class DBConnection {
 		}
 	}
 	
-	public void insertNewGame(Game game) throws Exception{
+	public void insertNewGame(Game game, String player1) throws Exception{
 		try {
 			//Das holen der ID ist nicht multiuser Save
-			int userId = getUserId(game.getPlayer1());
+			int userId = getUserId(player1);
 			String query = "INSERT INTO game (`player1`, `gamesize`, `state`) VALUES ('" + userId + "', '" + game.getGameSize() + "', '" + game.getStatus().getNummer() + "')";
 			statement.execute(query);
 			query = "SELECT max(id) FROM game";
@@ -179,15 +179,17 @@ public class DBConnection {
 					+ "WHERE game.id=" + id;
 			ResultSet rs = statement.executeQuery(query);
 			if(rs.next()){
-				Game game = new Game(id, rs.getInt("gamesize"));
-				game.setPlayer1(rs.getString("player1"));
+				String player1 = rs.getString("player1");
 				String player2 = rs.getString("player2");
-				if(!rs.wasNull())
-					game.setPlayer2(player2);
 				String nextPlayer = rs.getString("nextplayer");
-				if(!rs.wasNull())
+				int gameStatus = rs.getInt("state");
+				Game game = new Game(id, rs.getInt("gamesize"));
+				game.setPlayer1(player1);
+				if(player2 != null)
+					game.setPlayer2(player2);
+				if(nextPlayer != null)
 					game.setNextPlayer(nextPlayer);
-				game.setStatus(GameStatus.getEnum(rs.getInt("state")));
+				game.setStatus(GameStatus.getEnum(gameStatus));
 				return game;
 			}
 			throw new Exception("Game mit id " + id + " nicht gefunden.");
@@ -209,6 +211,77 @@ public class DBConnection {
 			return null;
 		} catch (SQLException e) {
 			throw new Exception("Fehler beim Suchen vom wartendem Spiel.\n" + e.getMessage());
+		}
+	}
+	
+	public void setStatus(int gameId, GameStatus gameStatus) throws Exception {
+		try {
+			if(gameStatus == null)
+				return;
+			String query = "UPDATE game SET state=" + gameStatus.getNummer() + " WHERE id=" + gameId;
+			statement.execute(query);
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim setzen des Status.\n" + e.getMessage());
+		}
+	}
+	
+	public void setNextPlayer(int gameId, String nextPlayer) throws Exception {
+		try {
+			String idNext = "NULL";
+			if(nextPlayer != null)
+				idNext = String.valueOf(getUserId(nextPlayer));
+			String query = "UPDATE game SET nextplayer=" + idNext + " WHERE id=" + gameId;
+			statement.execute(query);
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim setzen des Status.\n" + e.getMessage());
+		}
+	}
+	
+	public String getNextPlayer(int gameId) throws Exception {
+		try {
+			String query = "SELECT name FROM game "
+					+ "INNER JOIN player on nextplayer = player.id WHERE game.id=" + gameId;
+			ResultSet rs = statement.executeQuery(query);
+			if(rs.next()) {
+				String nextPlayer = rs.getString(1);
+				if(!rs.wasNull())
+					return nextPlayer;
+			}
+			return null;
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim holen des nächsten Spielers.\n" + e.getMessage());
+		}
+	}
+	
+	public String getPlayer1 (int gameId) throws Exception {
+		try {
+			String query = "SELECT name FROM game "
+					+ "INNER JOIN player on player1 = player.id WHERE game.id=" + gameId;
+			ResultSet rs = statement.executeQuery(query);
+			if(rs.next()) {
+				String nextPlayer = rs.getString(1);
+				if(!rs.wasNull())
+					return nextPlayer;
+			}
+			return null;
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim holen des nächsten Spielers.\n" + e.getMessage());
+		}
+	}
+	
+	public String getPlayer2 (int gameId) throws Exception {
+		try {
+			String query = "SELECT name FROM game "
+					+ "INNER JOIN player on player2 = player.id WHERE game.id=" + gameId;
+			ResultSet rs = statement.executeQuery(query);
+			if(rs.next()) {
+				String nextPlayer = rs.getString(1);
+				if(!rs.wasNull())
+					return nextPlayer;
+			}
+			return null;
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim holen des nächsten Spielers.\n" + e.getMessage());
 		}
 	}
 }
