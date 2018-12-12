@@ -33,23 +33,6 @@ public class GameBoard {
 	private JLabel labelWinner;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					GameBoard window = new GameBoard(3, null);
-					window.setMyTurn(true);
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the application.
 	 */
 	public GameBoard(int gameSize, Game game) {
