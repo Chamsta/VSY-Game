@@ -51,6 +51,7 @@ public class Game implements GameInterface {
 		this.id = id;
 	}
 	
+	@Override
 	public int getId(){
 		return this.id;
 	}
@@ -196,6 +197,11 @@ public class Game implements GameInterface {
 		return loadCells();
 	}
 	
+	/**
+	 * Lädt die Cells zu dem Spiel aus der Datenbank.
+	 * @return
+	 * @throws RemoteException
+	 */
 	private HashMap<String, Boolean> loadCells() throws RemoteException {
 		try {
 			return Server.dbConnection.getCells(id);
@@ -238,6 +244,7 @@ public class Game implements GameInterface {
 
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#setCell(int, int)
+	 * Und schreibt den geänderten Wert in die Datenbank
 	 */
 	@Override
 	public Boolean setCell(int positionX, int positionY, Boolean value) throws RemoteException {
@@ -253,6 +260,10 @@ public class Game implements GameInterface {
 		return value;
 	}
 	
+	/**
+	 * Prüf, ob das Spiel zu Ende ist (Spielfeld voll)
+	 * @throws RemoteException
+	 */
 	private void checkGameEnd() throws RemoteException {
 		boolean end = true;
 		for(Boolean val : getCells().values()){
@@ -268,6 +279,7 @@ public class Game implements GameInterface {
 
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#setCell(java.lang.String, java.lang.Boolean)
+	 * Erweitert um die Funktion, dass die angemeldeten Clients über die Änderung der Zelle informiert werden.
 	 */
 	@Override
 	public Boolean setCell(String key, Boolean value) throws RemoteException {
@@ -284,16 +296,20 @@ public class Game implements GameInterface {
 			posX = -1;
 			posY = -1;
 		}
-		if(getGameClient1() != null) {
+		if(gameClient1 != null) {
 			gameClient1.setCell(key, value);
 		}
-		if(getGameClient2() != null) {
+		if(gameClient2 != null) {
 			gameClient2.setCell(key, value);
 		}
 		SwitchPlayer();
 		return this.setCell(posX, posY, value);
 	}
 	
+	/**
+	 * Setzt eine Zelle, der Wert für die Zelle wird anhand des Spielernamens überprüft.
+	 * Spieler 1 hat true. Spieler 2 hat false.
+	 */
 	public Boolean setCell(String key, String player) throws RemoteException {
 		Boolean value = null;
 		if(player.equals(player1))
@@ -320,6 +336,7 @@ public class Game implements GameInterface {
 	
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#getNextPlayer()
+	 * Holt nextPlayer aus der Datenbank und setzt diesen über die setNextPlayer Methode.
 	 */
 	@Override
 	public String getNextPlayer() throws RemoteException {
@@ -335,6 +352,7 @@ public class Game implements GameInterface {
 
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#setNextPlayer(java.lang.String)
+	 * Schreibt nextPlayer in die Datenbank und setzt diesen bei den Clients.
 	 */
 	@Override
 	public void setNextPlayer(String nextPlayer) throws RemoteException {
@@ -344,16 +362,17 @@ public class Game implements GameInterface {
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage());
 		}
-		if(getGameClient1() != null){
+		if(gameClient1 != null){
 			gameClient1.setNextPlayer(this.nextPlayer);
 		}
-		if(getGameClient2() != null) {
+		if(gameClient2 != null) {
 			gameClient2.setNextPlayer(this.nextPlayer);
 		}
 	}
 
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#getPlayer1()
+	 * Ließt Player 1 aus der Datenbank
 	 */
 	@Override
 	public String getPlayer1() throws RemoteException {
@@ -366,13 +385,15 @@ public class Game implements GameInterface {
 
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#setPlayer1(java.lang.String)
+	 * Player 1 wird nicht in die Datenbank geschrieben, da dies beim Initialisieren des Games geschieht
+	 * Bei den Clients wird Player1 gesetzt
 	 */
 	@Override
 	public void setPlayer1(String value) throws RemoteException {
 		this.player1 = value;
-		if(getGameClient1() != null)
+		if(gameClient1 != null)
 			gameClient1.setPlayer1(value);
-		if(getGameClient2() != null)
+		if(gameClient2 != null)
 			gameClient2.setPlayer1(value);
 	}
 
@@ -394,9 +415,9 @@ public class Game implements GameInterface {
 	@Override
 	public void setPlayer2(String value) throws RemoteException {
 		this.player2 = value;
-		if(getGameClient1() != null)
+		if(gameClient1 != null)
 			gameClient1.setPlayer2(value);
-		if(getGameClient2() != null)
+		if(gameClient2 != null)
 			gameClient2.setPlayer2(value);
 	}
 
@@ -432,18 +453,12 @@ public class Game implements GameInterface {
 		return cells;
 	}
 	
-	private GameInterface getGameClient1() throws RemoteException {
-		if(gameClient1 != null)
-			return gameClient1;
-		gameClient1 = Server.getClientGame(getPlayer1());
-		return gameClient1;
+	public void setClientGame1(GameInterface clientGame) {
+		this.gameClient1 = clientGame;
 	}
 	
-	private GameInterface getGameClient2() throws RemoteException {
-		if(gameClient2 != null)
-			return gameClient2;
-		gameClient2 = Server.getClientGame(getPlayer2());
-		return gameClient2;
+	public void setClientGame2(GameInterface clientGame) {
+		this.gameClient2 = clientGame;
 	}
 	
 	/* (non-Javadoc)
@@ -465,14 +480,12 @@ public class Game implements GameInterface {
 	public void Stop() throws RemoteException{
 		setStatus(GameStatus.Terminated);
 		setNextPlayer(null);
-		if(getGameClient1() != null) {
+		if(gameClient1 != null) {
 			gameClient1.Stop();
 		}
-		if(getGameClient2() != null) {
+		if(gameClient2 != null) {
 			gameClient2.Stop();
 		}
-		Server.removeClientGame(player1);
-		Server.removeClientGame(player2);
 		Server.removeGame(id);
 	}
 	

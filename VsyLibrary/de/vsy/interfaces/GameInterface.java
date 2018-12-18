@@ -78,5 +78,9 @@ public interface GameInterface extends Remote, Serializable{
 	void Stop() throws RemoteException;
 
 	void SwitchPlayer() throws RemoteException;
-
+	
+	/**
+	 * get the Id
+	 */
+	int getId() throws RemoteException;
 }

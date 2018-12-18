@@ -1,11 +1,12 @@
 package main;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
 
 import de.vsy.interfaces.Echo;
 import de.vsy.interfaces.GameInterface;
@@ -15,6 +16,8 @@ import object.Game;
 
 
 public class Main { //Client
+	private static ServerInterface server;
+	private static String user;
 
 	public static void main(String[] args) {
 		System.out.println("Ich bin dein Client.");
@@ -29,39 +32,39 @@ public class Main { //Client
             String response = stub.echoThis("Hallo Du da.");
             System.out.println("response: " + response);
             
-            ServerInterface server = (ServerInterface) registry.lookup("Server");
+            server = (ServerInterface) registry.lookup("Server");
             
             Scanner scan = new Scanner(System.in);
-            String user = Login.getUsername();
-            server.login(user);
+            user = Login.getUsername();
+            try {
+            	server.login(user);				
+			} catch (RemoteException e) {
+				JOptionPane.showMessageDialog(null, e.getMessage());
+				System.exit(0);
+			}
             int id = server.getGameId(user);
             System.out.println("Game id is: " + id);
             
             String reg = "Game"+id;
             System.out.println("Getting " + reg);
             GameInterface gameServer = (GameInterface) registry.lookup(reg);
-            HashMap<String, Boolean> cells = gameServer.getCells();
-            System.out.println(cells);
             
             Game game = new Game(gameServer, user);
             GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
-            registry.rebind("GameClient" + user, gameStub);
+            server.addClientGame(game.getId(), user, gameStub);
             game.Play();
             
-//            for (int i = 0; i < 5; i++) {
-//            	System.out.println("Welche Zelle?");
-//            	String cell = scan.nextLine();
-//            	game.setCell(cell, user);
-//            	cells = game.getCells();
-//            	System.out.println(cells);				
-//			}
-            
-            server.logout(user);
             scan.close();
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
+            System.exit(0);
         }
 	}
 
+	public static void logout() throws RemoteException {
+		if(server != null && user != null) {
+			server.logout(user);
+		}
+	}
 }

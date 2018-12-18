@@ -70,6 +70,18 @@ public class DBConnection {
 		}
 	}
 	
+	public boolean isUserLoggedIn(String username) throws Exception {
+		try {
+			String query = "SELECT `loggedin` FROM player WHERE name = '" + username + "'";
+			ResultSet rs = statement.executeQuery(query);
+			if(rs.next())
+				return rs.getBoolean(1);
+			return false;
+		} catch (SQLException e) {
+			throw new Exception("Fehler bei der Abfrage, ob der User eingeloggt ist.\n" +e.getMessage());
+		}
+	}
+	
 	public Integer getGameIdForUser(String username) throws Exception {
 		try {
 			String query = "SELECT game.id FROM game " 

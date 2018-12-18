@@ -22,6 +22,7 @@ public class Game implements GameInterface {
 		this.gameServer = gameServer;
 		this.gameSize = gameServer.getGameSize();
 		this.player = player;
+		this.id = gameServer.getId();
 		this.gameBoard = new GameBoard(gameSize, this);
 		this.gameBoard.setPlayer(player);
 	}
@@ -54,12 +55,19 @@ public class Game implements GameInterface {
 		return null;
 	}
 
+	/**
+	 * Diese Methode wird vom Server aufgerufen und setzt die entsprechende Zelle auf dem GUI
+	 */
 	@Override
 	public Boolean setCell(String key, Boolean value) throws RemoteException {
 		this.gameBoard.setValue(key, value);
 		return true;
 	}
 
+	/**
+	 * Diese Methode wird aus dem GUI aufgerufen, und schickt dem Server welche Zelle von dem Spieler dieses Clients angeklickt wurde.
+	 * Der Server bearbeitet diese Anfrage und ruft das die obere setCell Methode auf beiden Clients auf um das Feld zu setzen.
+	 */
 	@Override
 	public Boolean setCell(String key, String player) throws RemoteException {
 		return this.gameServer.setCell(key, player);
@@ -75,6 +83,9 @@ public class Game implements GameInterface {
 		return this.gameServer.getNextPlayer();
 	}
 
+	/**
+	 * Wird vom Server aufgerufen und gibt an das GUI weiter wer dran ist.
+	 */
 	@Override
 	public void setNextPlayer(String nextPlayer) throws RemoteException {
 		if(player.equals(nextPlayer)) {
@@ -119,6 +130,14 @@ public class Game implements GameInterface {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * Startet das Spiel und zeigt das GUI an
+	 */
 	@Override
 	public void Play() throws RemoteException {
 		HashMap<String, Boolean> map = this.gameServer.getCells();

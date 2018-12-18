@@ -1,15 +1,16 @@
 package gui;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import main.Main;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
@@ -67,7 +68,7 @@ public class GameBoard {
 		
 		JPanel panelGame = new JPanel();
 		panelGame.setLayout(new GridLayout(this.gameSize, this.gameSize, 1, 1));
-		addLabels(panelGame);
+		addButtons(panelGame);
 		frame.getContentPane().add(panelGame, "cell 0 1,grow");
 		
 		JPanel panelButton = new JPanel();
@@ -75,9 +76,39 @@ public class GameBoard {
 		
 		labelWinner = new JLabel();
 		panelButton.add(labelWinner);
+		
+		frame.addWindowListener(new WindowListener() {
+			
+			@Override
+			public void windowOpened(WindowEvent e) {}
+			
+			@Override
+			public void windowIconified(WindowEvent e) {}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {}
+			
+			@Override
+			public void windowDeactivated(WindowEvent e) {}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				try {
+					Main.logout();
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void windowClosed(WindowEvent e) {}
+			
+			@Override
+			public void windowActivated(WindowEvent e) {}
+		});
 	}
 	
-	private void addLabels(JPanel panelGame) {
+	private void addButtons(JPanel panelGame) {
 		mapButton = new HashMap<String, JButton>();
 		ActionListener action = getActionListener();
 		for(int i = 1; i<= this.gameSize; i++){
@@ -95,6 +126,11 @@ public class GameBoard {
 		}
 	}
 
+	/**
+	 * Der Actiopn Listener hängt an allen buttons und schickt dem Game welches Feld angeklickt wurde. 
+	 * Das passiert nur, wenn die Variable myTurn == true ist.
+	 * @return
+	 */
 	private ActionListener getActionListener() {
 		ActionListener actionListener = new ActionListener() {
 			
@@ -115,6 +151,11 @@ public class GameBoard {
 		return actionListener;
 	}
 	
+	/**
+	 * Schreibt ein X wenn @param value == true und für false ein O. Falls value null ist wird das Feld geleert.
+	 * @param key
+	 * @param value
+	 */
 	public void setValue(String key, Boolean value) {
 		JButton button = mapButton.get(key);
 		if(value == null){

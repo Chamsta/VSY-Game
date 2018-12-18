@@ -5,6 +5,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 
 import dbconnect.DBConnection;
 import de.vsy.interfaces.GameInterface;
@@ -14,21 +15,33 @@ import de.vsy.interfaces.tictactoe.GameStatus;
 public class Server implements ServerInterface {
 	public static DBConnection dbConnection;
 	private static Registry registry;
+	private static HashMap<Integer, Game> mapGames = new HashMap<Integer, Game>();
 	
 	public Server(Registry registry) {
 		Server.registry = registry;
 		dbConnection = new DBConnection();
 	}
 
+	/**
+	 * Der user wird eingeloggt.
+	 */
 	@Override
 	public void login(String user) throws RemoteException {
 		try {
+			if(dbConnection.isUserLoggedIn(user)){
+				throw new RemoteException("User " + user + " ist bereits eingeloggt.");
+			}
 			dbConnection.loginUser(user);
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage());
 		}
 	}
 
+	/**
+	 * Für den gegebenen User wird ein Spiel gesucht. Erst wird nach einem Spiel gesucht, welches den spieler schon eingetragen hat.
+	 * Danach wird nach einem Spiel gesucht, dass auf einen zweiten Spieler wartet.
+	 * Falls beides nicht gefunden wird, wird ein neues Spiel angelegt.
+	 */
 	@Override
 	public int getGameId(String user) throws RemoteException {
 		try {
@@ -47,6 +60,9 @@ public class Server implements ServerInterface {
 		}
 	}
 
+	/**
+	 * Der User wird ausgeloggt.
+	 */
 	@Override
 	public void logout(String user) throws RemoteException {
 		try {
@@ -56,33 +72,46 @@ public class Server implements ServerInterface {
 		}
 	}
 
+	/**
+	 * Ein neues Spiel für den User wird erstellt und in der Datenbank angelegt.
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
 	private int createGame(String user) throws Exception{
 		Game game = new Game(-1);
 		game.setPlayer1(user);
 		game.setStatus(GameStatus.Waiting);
 		dbConnection.insertNewGame(game, user);
-		try {
-			String reg ="Game" + game.getId();
-			GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
-			registry.bind(reg, gameStub);
-			System.out.println("Registered " + reg);
-			game.Play();
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
+		registerGame(game.getId());
 		return game.getId();
 	}
 	
+	/**
+	 * Das Game wird in der Registry publiziert unter dem Namen "Game<id>".
+	 * Die Games werden auf dem Server in einer Hashmap gehalten um die Referenzen zu den Clients nicht zu verlieren, da diese nicht in die Datenbank geschrieben werden können.
+	 * @param gameId
+	 * @throws Exception
+	 */
 	private void registerGame(int gameId) throws Exception {
-		Game game = dbConnection.getGame(gameId);
-		String reg ="Game" + game.getId();
-		GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
-		registry.rebind(reg, gameStub);
-		System.out.println("Registered " + reg);
+		Game game = mapGames.get(gameId);
+		if(game == null) {
+			game = dbConnection.getGame(gameId);
+			String reg ="Game" + game.getId();
+			GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
+			registry.rebind(reg, gameStub);
+			mapGames.put(game.getId(), game);
+			System.out.println("Registered " + reg);
+		}
 		game.Play();
 	}
 	
+	/**
+	 * Sucht ein wartendes Spiel, also ein spiel indem noch kein zweiter Spieler ist.
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
 	private Integer findWaitingGame(String user) throws Exception {
 		Game game = dbConnection.findWaitingGame(user);
 		if(game != null) {
@@ -93,19 +122,10 @@ public class Server implements ServerInterface {
 		return null;
 	}
 	
-	public static GameInterface getClientGame(String user) {
-		try {
-			GameInterface gameClient = (GameInterface) registry.lookup("GameClient" + user);
-			return gameClient;
-		} catch (AccessException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (NotBoundException e) {
-		}
-		return null;
-	}
-	
+	/**
+	 * Wenn das Spiel vorbei ist wird es aus der Registry entfernt.
+	 * @param gameId
+	 */
 	public static void removeGame(int gameId) {
 		try {
 			registry.unbind("Game" + gameId);
@@ -116,15 +136,22 @@ public class Server implements ServerInterface {
 		} catch (NotBoundException e) {
 		}
 	}
-	
-	public static void removeClientGame(String user) {
-		try {
-			registry.unbind("GameClient" + user);
-		} catch (AccessException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (NotBoundException e) {
+
+	/**
+	 * Fügt dem Spiel das Remote Object zu dem Client game hinzu, über diese Remote Objecte kann der Server informationen an die beiden Clients schicken.
+	 */
+	@Override
+	public void addClientGame(int gameId, String user, GameInterface clientGame) throws RemoteException {
+		Game game = mapGames.get(gameId);
+		if(game == null) {
+			throw new RemoteException("Game mit dieser ID nicht gefunden.");
+		}
+		if(game.getPlayer1().equals(user)) {
+			game.setClientGame1(clientGame);
+		} else if(game.getPlayer2() == null || game.getPlayer2().equals(user)) {
+			game.setClientGame2(clientGame);
+		} else {
+			throw new RemoteException("Dieser Spieler ist nicht in dem Game vorhanden.");
 		}
 	}
 }
