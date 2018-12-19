@@ -8,19 +8,22 @@ public class Login {
 	public static String getUsername() {
 		if(username != null)
 			return username;
-		while (username == null || username.isEmpty()){
+		
+		do{
 			username = JOptionPane.showInputDialog("Benutzernamen eingeben");
-		}
+		}while (username == null || username.isEmpty());
+		
 		return username;
 	}
 	
 	public static String getServer() {
 		if(server != null)
 			return server;
-		server = JOptionPane.showInputDialog("Serveradresse eingeben", "vom-Wege.de");
-		while (server == null || server.isEmpty()){
+		
+		do{
 			server = JOptionPane.showInputDialog("Serveradresse eingeben", "vom-Wege.de");
-		}
+		}while (server == null || server.isEmpty());
+		
 		return server;
 	}
 }
