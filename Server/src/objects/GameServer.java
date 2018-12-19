@@ -10,7 +10,7 @@ import de.vsy.interfaces.tictactoe.GameStatus;
  * @author Gladis
  *
  */
-public class Game implements GameInterface {
+public class GameServer implements GameInterface {
 	/**
 	 * 
 	 */
@@ -31,14 +31,14 @@ public class Game implements GameInterface {
 	/**
 	 * 
 	 */
-	public Game(int id){
+	public GameServer(int id){
 		this(id, DEFAULT_GAME_SIZE);
 	}
 
 	/**
 	 * @param size
 	 */
-	public Game(int id, int size){
+	public GameServer(int id, int size){
 		this.id = id;
 		this.gameSize = size < DEFAULT_GAME_SIZE ? DEFAULT_GAME_SIZE : size;
 		this.gameSize = size > GAME_SIZE_MAX ? GAME_SIZE_MAX : size;

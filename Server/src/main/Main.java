@@ -21,6 +21,7 @@ public class Main implements Echo{ //Server
 			System.out.println("Bitte Adresse des Servers beim Start angeben!");
 			System.exit(0);
 		}
+		boolean loggoutAllUsers = (args.length < 2) ? false : Boolean.valueOf(args[0]);
 		System.out.println("Server startet auf Adresse: " + host);
 		try {
         	//Beim Starten aus Eclipse den vollständigen Pfad zu security.policy eingeben!
@@ -34,6 +35,10 @@ public class Main implements Echo{ //Server
 			Echo stub = (Echo) UnicastRemoteObject.exportObject(obj,0);
 			
 			Server server = new Server(registry);
+			if(loggoutAllUsers) {
+				Server.dbConnection.logoutAllUsers();
+				System.out.println("Alle User ausgeloggt.");
+			}
 			ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server,0);
 
             registry.bind("Echo", stub);

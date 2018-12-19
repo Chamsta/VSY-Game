@@ -10,7 +10,7 @@ import java.util.HashMap;
 import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 
 import de.vsy.interfaces.tictactoe.GameStatus;
-import objects.Game;
+import objects.GameServer;
 
 public class DBConnection {
 	private static Connection connection;
@@ -82,6 +82,15 @@ public class DBConnection {
 		}
 	}
 	
+	public void logoutAllUsers() throws Exception {
+		try {
+			String query = "UPDATE `player` SET `loggedin`=0";
+			statement.execute(query);
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim logout aller User.\n" +e.getMessage());
+		}
+	}
+	
 	public Integer getGameIdForUser(String username) throws Exception {
 		try {
 			String query = "SELECT game.id FROM game " 
@@ -97,7 +106,7 @@ public class DBConnection {
 		}
 	}
 	
-	public void insertNewGame(Game game, String player1) throws Exception{
+	public void insertNewGame(GameServer game, String player1) throws Exception{
 		try {
 			//Das holen der ID ist nicht multiuser Save
 			int userId = getUserId(player1);
@@ -114,7 +123,7 @@ public class DBConnection {
 		}
 	}
 	
-	private void initNewGame(Game game) throws Exception {
+	private void initNewGame(GameServer game) throws Exception {
 		try {
 			String query = "START TRANSACTION;";
 			statement.execute(query);
@@ -181,7 +190,7 @@ public class DBConnection {
 		}
 	}
 	
-	public Game getGame(int id) throws Exception {
+	public GameServer getGame(int id) throws Exception {
 		try {
 			String query = "SELECT game.gamesize, game.state, player1.name player1, player2.name player2, playernext.name nextplayer "
 					+ "FROM game "
@@ -195,7 +204,7 @@ public class DBConnection {
 				String player2 = rs.getString("player2");
 				String nextPlayer = rs.getString("nextplayer");
 				int gameStatus = rs.getInt("state");
-				Game game = new Game(id, rs.getInt("gamesize"));
+				GameServer game = new GameServer(id, rs.getInt("gamesize"));
 				game.setPlayer1(player1);
 				if(player2 != null)
 					game.setPlayer2(player2);
@@ -210,7 +219,7 @@ public class DBConnection {
 		}
 	}
 
-	public Game findWaitingGame(String user) throws Exception {
+	public GameServer findWaitingGame(String user) throws Exception {
 		try {
 			String query = "SELECT game.id FROM game WHERE game.player2 IS NULL AND game.state = " + GameStatus.Waiting.getNummer();
 			ResultSet rs = statement.executeQuery(query);

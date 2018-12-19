@@ -15,7 +15,7 @@ import de.vsy.interfaces.tictactoe.GameStatus;
 public class Server implements ServerInterface {
 	public static DBConnection dbConnection;
 	private static Registry registry;
-	private static HashMap<Integer, Game> mapGames = new HashMap<Integer, Game>();
+	private static HashMap<Integer, GameServer> mapGames = new HashMap<Integer, GameServer>();
 	
 	public Server(Registry registry) {
 		Server.registry = registry;
@@ -79,7 +79,7 @@ public class Server implements ServerInterface {
 	 * @throws Exception
 	 */
 	private int createGame(String user) throws Exception{
-		Game game = new Game(-1);
+		GameServer game = new GameServer(-1);
 		game.setPlayer1(user);
 		game.setStatus(GameStatus.Waiting);
 		dbConnection.insertNewGame(game, user);
@@ -94,7 +94,7 @@ public class Server implements ServerInterface {
 	 * @throws Exception
 	 */
 	private void registerGame(int gameId) throws Exception {
-		Game game = mapGames.get(gameId);
+		GameServer game = mapGames.get(gameId);
 		if(game == null) {
 			game = dbConnection.getGame(gameId);
 			String reg ="Game" + game.getId();
@@ -113,7 +113,7 @@ public class Server implements ServerInterface {
 	 * @throws Exception
 	 */
 	private Integer findWaitingGame(String user) throws Exception {
-		Game game = dbConnection.findWaitingGame(user);
+		GameServer game = dbConnection.findWaitingGame(user);
 		if(game != null) {
 			game.setPlayer2(user);
 			registerGame(game.getId());
@@ -142,7 +142,7 @@ public class Server implements ServerInterface {
 	 */
 	@Override
 	public void addClientGame(int gameId, String user, GameInterface clientGame) throws RemoteException {
-		Game game = mapGames.get(gameId);
+		GameServer game = mapGames.get(gameId);
 		if(game == null) {
 			throw new RemoteException("Game mit dieser ID nicht gefunden.");
 		}

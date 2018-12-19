@@ -19,7 +19,7 @@ import javax.swing.JButton;
 import java.awt.Font;
 
 import net.miginfocom.swing.MigLayout;
-import object.Game;
+import object.GameClient;
 
 public class GameBoard {
 
@@ -27,7 +27,7 @@ public class GameBoard {
 	private int gameSize;
 	private HashMap<String, JButton> mapButton;
 	private boolean myTurn;
-	private Game game;
+	private GameClient game;
 	private JLabel labelPlayer1;
 	private JLabel labelPlayer2;
 	private JLabel labelNext;
@@ -36,7 +36,7 @@ public class GameBoard {
 	/**
 	 * Create the application.
 	 */
-	public GameBoard(int gameSize, Game game) {
+	public GameBoard(int gameSize, GameClient game) {
 		this.gameSize = gameSize;
 		this.game = game;
 		initialize();

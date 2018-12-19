@@ -7,7 +7,7 @@ import de.vsy.interfaces.GameInterface;
 import de.vsy.interfaces.tictactoe.GameStatus;
 import gui.GameBoard;
 
-public class Game implements GameInterface {
+public class GameClient implements GameInterface {
 	/**
 	 * 
 	 */
@@ -18,7 +18,7 @@ public class Game implements GameInterface {
 	int gameSize;
 	int id;
 	
-	public Game(GameInterface gameServer, String player) throws RemoteException{
+	public GameClient(GameInterface gameServer, String player) throws RemoteException{
 		this.gameServer = gameServer;
 		this.gameSize = gameServer.getGameSize();
 		this.player = player;
