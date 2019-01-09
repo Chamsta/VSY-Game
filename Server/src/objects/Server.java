@@ -142,6 +142,7 @@ public class Server implements ServerInterface {
 	 */
 	@Override
 	public void addClientGame(int gameId, String user, GameInterface clientGame) throws RemoteException {
+		System.out.println("Adding Client game " + user + gameId);
 		GameServer game = mapGames.get(gameId);
 		if(game == null) {
 			throw new RemoteException("Game mit dieser ID nicht gefunden.");

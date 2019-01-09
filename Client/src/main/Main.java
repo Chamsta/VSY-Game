@@ -51,7 +51,9 @@ public class Main { //Client
             
             GameClient game = new GameClient(gameServer, user);
             GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
+            System.out.println("Register Client at Server");
             server.addClientGame(game.getId(), user, gameStub);
+            System.out.println("Starting game");
             game.Play();
             
             scan.close();
