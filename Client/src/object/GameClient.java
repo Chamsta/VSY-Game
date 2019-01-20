@@ -3,22 +3,22 @@ package object;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
-import de.vsy.interfaces.GameInterface;
+import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.tictactoe.GameStatus;
 import gui.GameBoard;
 
-public class GameClient implements GameInterface {
+public class GameClient implements IGame {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7513278496760323195L;
-	private GameInterface gameServer;
+	private IGame gameServer;
 	private GameBoard gameBoard;
 	private String player;
 	int gameSize;
 	int id;
 	
-	public GameClient(GameInterface gameServer, String player) throws RemoteException{
+	public GameClient(IGame gameServer, String player) throws RemoteException{
 		this.gameServer = gameServer;
 		this.gameSize = gameServer.getGameSize();
 		this.player = player;

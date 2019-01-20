@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import de.vsy.interfaces.tictactoe.GameStatus;
 
-public interface GameInterface extends Remote, Serializable{
+public interface IGame extends Remote, Serializable{
 
 	/**
 	 * @return the cells

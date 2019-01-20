@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 import dbconnect.DBConnection;
-import de.vsy.interfaces.GameInterface;
+import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.IServer;
 import de.vsy.interfaces.tictactoe.GameStatus;
 
@@ -98,7 +98,7 @@ public class Server implements IServer {
 		if(game == null) {
 			game = dbConnection.getGame(gameId);
 			String reg ="Game" + game.getId();
-			GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
+			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(game,0);
 			registry.rebind(reg, gameStub);
 			mapGames.put(game.getId(), game);
 			System.out.println("Registered " + reg);
@@ -141,7 +141,7 @@ public class Server implements IServer {
 	 * Fügt dem Spiel das Remote Object zu dem Client game hinzu, über diese Remote Objecte kann der Server informationen an die beiden Clients schicken.
 	 */
 	@Override
-	public void addClientGame(int gameId, String user, GameInterface clientGame) throws RemoteException {
+	public void addClientGame(int gameId, String user, IGame clientGame) throws RemoteException {
 		GameServer game = mapGames.get(gameId);
 		if(game == null) {
 			throw new RemoteException("Game mit dieser ID nicht gefunden.");

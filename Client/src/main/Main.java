@@ -9,7 +9,7 @@ import java.util.Scanner;
 import javax.swing.JOptionPane;
 
 import de.vsy.interfaces.IEcho;
-import de.vsy.interfaces.GameInterface;
+import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.IServer;
 import gui.Login;
 import object.GameClient;
@@ -47,10 +47,10 @@ public class Main { //Client
             
             String reg = "Game"+id;
             System.out.println("Getting " + reg);
-            GameInterface gameServer = (GameInterface) registry.lookup(reg);
+            IGame gameServer = (IGame) registry.lookup(reg);
             
             GameClient game = new GameClient(gameServer, user);
-            GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
+            IGame gameStub = (IGame) UnicastRemoteObject.exportObject(game,0);
             server.addClientGame(game.getId(), user, gameStub);
             game.Play();
             

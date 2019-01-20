@@ -3,14 +3,14 @@ package objects;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
-import de.vsy.interfaces.GameInterface;
+import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.tictactoe.GameStatus;
 
 /**
  * @author Gladis
  *
  */
-public class GameServer implements GameInterface {
+public class GameServer implements IGame {
 	/**
 	 * 
 	 */
@@ -25,8 +25,8 @@ public class GameServer implements GameInterface {
 	private String player2;	
 	private GameStatus status;
 	private int winTimes;
-	private GameInterface gameClient1;
-	private GameInterface gameClient2;
+	private IGame gameClient1;
+	private IGame gameClient2;
 	
 	/**
 	 * 
@@ -453,11 +453,11 @@ public class GameServer implements GameInterface {
 		return cells;
 	}
 	
-	public void setClientGame1(GameInterface clientGame) {
+	public void setClientGame1(IGame clientGame) {
 		this.gameClient1 = clientGame;
 	}
 	
-	public void setClientGame2(GameInterface clientGame) {
+	public void setClientGame2(IGame clientGame) {
 		this.gameClient2 = clientGame;
 	}
 	

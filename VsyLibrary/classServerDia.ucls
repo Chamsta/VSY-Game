@@ -28,8 +28,8 @@
       <operations public="true" package="true" protected="true" private="false" static="true"/>    
     </display>  
   </class>  
-  <interface id="4" language="java" name="de.vsy.interfaces.GameInterface" project="VsyLibrary" 
-    file="/VsyLibrary/de/vsy/interfaces/GameInterface.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="4" language="java" name="de.vsy.interfaces.IGame" project="VsyLibrary" 
+    file="/VsyLibrary/de/vsy/interfaces/IGame.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="211" y="102"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
