@@ -5,7 +5,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import de.vsy.interfaces.IEcho;
-import de.vsy.interfaces.ServerInterface;
+import de.vsy.interfaces.IServer;
 import objects.Echo;
 import objects.Server;
 
@@ -52,7 +52,7 @@ public class Main { //Server
 				Server.dbConnection.logoutAllUsers();
 				System.out.println("Alle User ausgeloggt.");
 			}
-			ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server, portNumber);
+			IServer serverStub = (IServer) UnicastRemoteObject.exportObject(server, portNumber);
 
             registry.bind("Echo", stubEcho);
             registry.bind("Server", serverStub);

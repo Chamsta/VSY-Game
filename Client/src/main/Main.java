@@ -10,13 +10,13 @@ import javax.swing.JOptionPane;
 
 import de.vsy.interfaces.IEcho;
 import de.vsy.interfaces.GameInterface;
-import de.vsy.interfaces.ServerInterface;
+import de.vsy.interfaces.IServer;
 import gui.Login;
 import object.GameClient;
 
 
 public class Main { //Client
-	private static ServerInterface server;
+	private static IServer server;
 	private static String user;
 
 	public static void main(String[] args) {
@@ -32,7 +32,7 @@ public class Main { //Client
             String response = stub.echoThis("Hallo Du da.");
             System.out.println("response: " + response);
             
-            server = (ServerInterface) registry.lookup("Server");
+            server = (IServer) registry.lookup("Server");
             
             Scanner scan = new Scanner(System.in);
             user = Login.getUsername();

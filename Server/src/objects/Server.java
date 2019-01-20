@@ -9,10 +9,10 @@ import java.util.HashMap;
 
 import dbconnect.DBConnection;
 import de.vsy.interfaces.GameInterface;
-import de.vsy.interfaces.ServerInterface;
+import de.vsy.interfaces.IServer;
 import de.vsy.interfaces.tictactoe.GameStatus;
 
-public class Server implements ServerInterface {
+public class Server implements IServer {
 	public static DBConnection dbConnection;
 	private static Registry registry;
 	private static HashMap<Integer, GameServer> mapGames = new HashMap<Integer, GameServer>();
