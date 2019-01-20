@@ -25,8 +25,8 @@ public class Main { //Client
 		System.out.println(host);
         try {
             //Beim Starten aus Eclipse den vollstaendigen Pfad zu security.policy eingeben!
-        	  System.setProperty("java.security.policy", "security.policy");
-        	  System.setSecurityManager(new SecurityManager());
+        	System.setProperty("java.security.policy", "security.policy");
+        	System.setSecurityManager(new SecurityManager());
             Registry registry = LocateRegistry.getRegistry(host);
             Echo stub = (Echo) registry.lookup("Echo");
             String response = stub.echoThis("Hallo Du da.");
