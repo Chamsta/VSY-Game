@@ -1,0 +1,1 @@
+java -Djava.security.policy=security.policy -jar vsyServer.jar vom-wege.de
