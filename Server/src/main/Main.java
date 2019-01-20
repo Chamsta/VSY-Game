@@ -11,6 +11,8 @@ import objects.Server;
 
 
 public class Main { //Server
+	private static final int RMI_PORT_MIN = 2000;
+	private static final int RMI_PORT_MAX = 49150;
 	private static Registry registry;
 	private static int portNumber;
 	
@@ -24,15 +26,15 @@ public class Main { //Server
 		if(args.length == 2){
 			try {
 				portNumber = Integer.parseInt(args[1]);
-				if(portNumber < 2000 && portNumber > 49150){
-					portNumber = 2000;
+				if(portNumber < RMI_PORT_MIN && portNumber > RMI_PORT_MAX){
+					portNumber = RMI_PORT_MIN;
 				}
 			} catch (NumberFormatException e) {
-				portNumber = 2000;
+				portNumber = RMI_PORT_MIN;
 			}
 		}
 		else{
-			portNumber = 2000;
+			portNumber = RMI_PORT_MIN;
 		}
 		boolean loggoutAllUsers = (args.length < 2) ? false : Boolean.valueOf(args[1]);
 		System.out.println("Server startet auf Adresse: " + host);
