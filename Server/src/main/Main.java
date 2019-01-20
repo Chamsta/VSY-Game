@@ -6,13 +6,15 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import dbconnect.DBConnection;
-import de.vsy.interfaces.Echo;
+import de.vsy.interfaces.IEcho;
 import de.vsy.interfaces.ServerInterface;
+import objects.Echo;
 import objects.Server;
 
 
-public class Main implements Echo{ //Server
+public class Main { //Server
 	private static Registry registry;
+	private static int portNumber;
 	
 	public static void main(String[] args) {
 		System.out.println("Server startet. Wenn es mal programmiert wurde...");
@@ -20,6 +22,19 @@ public class Main implements Echo{ //Server
 		if(host == null){
 			System.out.println("Bitte Adresse des Servers beim Start angeben!");
 			System.exit(0);
+		}
+		if(args.length == 2){
+			try {
+				portNumber = Integer.parseInt(args[1]);
+				if(portNumber < 2000 && portNumber > 49150){
+					portNumber = 2000;
+				}
+			} catch (NumberFormatException e) {
+				portNumber = 2000;
+			}
+		}
+		else{
+			portNumber = 2000;
 		}
 		boolean loggoutAllUsers = (args.length < 2) ? false : Boolean.valueOf(args[0]);
 		System.out.println("Server startet auf Adresse: " + host);
@@ -31,17 +46,17 @@ public class Main implements Echo{ //Server
 			LocateRegistry.createRegistry(Registry.REGISTRY_PORT); 
 			registry = LocateRegistry.getRegistry();
 			
-			Main obj = new Main();
-			Echo stub = (Echo) UnicastRemoteObject.exportObject(obj,0);
+			IEcho objEcho = new Echo();
+			IEcho stubEcho = (IEcho) UnicastRemoteObject.exportObject(objEcho, portNumber);
 			
 			Server server = new Server(registry);
 			if(loggoutAllUsers) {
 				Server.dbConnection.logoutAllUsers();
 				System.out.println("Alle User ausgeloggt.");
 			}
-			ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server,0);
+			ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server, portNumber);
 
-            registry.bind("Echo", stub);
+            registry.bind("Echo", stubEcho);
             registry.bind("Server", serverStub);
             System.err.println("Server ready!");
         } catch (Exception e) {
@@ -49,17 +64,5 @@ public class Main implements Echo{ //Server
             e.printStackTrace();
             System.exit(0);
         }
-	}
-
-	@Override
-	public String echoThis(String text) throws RemoteException {
-		return "Echo " + text;
-	}
-
-	@Override
-	public String sqlQuery(String query) throws RemoteException {
-		DBConnection dbConnection = new DBConnection();
-		String test = dbConnection.execute(query);
-		return test;
 	}
 }

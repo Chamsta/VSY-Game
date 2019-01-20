@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
-import de.vsy.interfaces.Echo;
+import de.vsy.interfaces.IEcho;
 import de.vsy.interfaces.GameInterface;
 import de.vsy.interfaces.ServerInterface;
 import gui.Login;
@@ -28,7 +28,7 @@ public class Main { //Client
         	System.setProperty("java.security.policy", "security.policy");
         	System.setSecurityManager(new SecurityManager());
             Registry registry = LocateRegistry.getRegistry(host);
-            Echo stub = (Echo) registry.lookup("Echo");
+            IEcho stub = (IEcho) registry.lookup("Echo");
             String response = stub.echoThis("Hallo Du da.");
             System.out.println("response: " + response);
             
