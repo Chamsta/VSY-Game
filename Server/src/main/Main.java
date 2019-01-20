@@ -34,11 +34,12 @@ public class Main { //Server
 		else{
 			portNumber = 2000;
 		}
-		boolean loggoutAllUsers = (args.length < 2) ? false : Boolean.valueOf(args[0]);
+		boolean loggoutAllUsers = (args.length < 2) ? false : Boolean.valueOf(args[1]);
 		System.out.println("Server startet auf Adresse: " + host);
 		try {
+			String serverPath = System.getProperty("user.dir") + "\\compiled_jar\\";
         	//Beim Starten aus Eclipse den vollständigen Pfad zu security.policy eingeben!
-			System.setProperty("java.security.policy", "security.policy");
+			System.setProperty("java.security.policy", serverPath + "security.policy");
 			System.setSecurityManager(new SecurityManager());
 			System.setProperty("java.rmi.server.hostname",host);
 			LocateRegistry.createRegistry(Registry.REGISTRY_PORT); 
