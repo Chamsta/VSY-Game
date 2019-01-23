@@ -23,7 +23,7 @@ public class Main { //Server
 			System.out.println("Bitte Adresse des Servers beim Start angeben!");
 			System.exit(0);
 		}
-		if(args.length == 2){
+		if(args.length >= 2){
 			try {
 				portNumber = Integer.parseInt(args[1]);
 				if(portNumber < RMI_PORT_MIN && portNumber > RMI_PORT_MAX){
@@ -36,7 +36,7 @@ public class Main { //Server
 		else{
 			portNumber = RMI_PORT_MIN;
 		}
-		boolean loggoutAllUsers = (args.length < 2) ? false : Boolean.valueOf(args[1]);
+		boolean loggoutAllUsers = (args.length < 3) ? false : Boolean.valueOf(args[2]);
 		System.out.println("Server startet auf Adresse: " + host);
 		try {
 			String serverPath = System.getProperty("user.dir") + "\\compiled_jar\\";
