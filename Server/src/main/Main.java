@@ -40,6 +40,9 @@ public class Main { //Server
 		System.out.println("Server startet auf Adresse: " + host);
 		try {
 			String serverPath = System.getProperty("user.dir") + "\\compiled_jar\\";
+			if(!serverPath.toLowerCase().contains("compiled_jar")){
+				serverPath += serverPath.endsWith("\\") ? "compiled_jar\\" : "\\compiled_jar\\";
+			}
         	//Beim Starten aus Eclipse den vollständigen Pfad zu security.policy eingeben!
 			System.setProperty("java.security.policy", serverPath + "security.policy");
 			System.setSecurityManager(new SecurityManager());
