@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
-
 import de.vsy.interfaces.tictactoe.GameStatus;
 import objects.GameServer;
 
@@ -22,9 +20,6 @@ public class DBConnection {
 			if(connection == null || connection.isClosed())
 				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/vsygame", "vsyuser", "vsyPasswort18!");
 			this.statement = connection.createStatement();
-		}catch(CommunicationsException e){
-			// TODO Auto-generated catch block
-			e.printStackTrace();	
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
