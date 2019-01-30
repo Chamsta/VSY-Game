@@ -24,8 +24,12 @@ public class Main { //Client
 		String host = Login.getServer();
 		System.out.println(host);
         try {
+        	String clientPath = System.getProperty("user.dir") + "\\compiled_jar\\";
+			if(!clientPath.toLowerCase().contains("compiled_jar")){
+				clientPath += clientPath.endsWith("\\") ? "compiled_jar\\" : "\\compiled_jar\\";
+			}
             //Beim Starten aus Eclipse den vollstaendigen Pfad zu security.policy eingeben!
-        	System.setProperty("java.security.policy", "security.policy");
+        	System.setProperty("java.security.policy", clientPath + "security.policy");
         	System.setSecurityManager(new SecurityManager());
             Registry registry = LocateRegistry.getRegistry(host,0);
             IEcho stub = (IEcho) registry.lookup("Echo");
