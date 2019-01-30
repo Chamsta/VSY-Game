@@ -32,14 +32,14 @@ public class Main implements Echo{ //Server
 			registry = LocateRegistry.getRegistry();
 			
 			Main obj = new Main();
-			Echo stub = (Echo) UnicastRemoteObject.exportObject(obj,0);
+			Echo stub = (Echo) UnicastRemoteObject.exportObject(obj,Registry.REGISTRY_PORT);
 			
 			Server server = new Server(registry);
 			if(loggoutAllUsers) {
 				Server.dbConnection.logoutAllUsers();
 				System.out.println("Alle User ausgeloggt.");
 			}
-			ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server,0);
+			ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server,Registry.REGISTRY_PORT);
 
             registry.bind("Echo", stub);
             registry.bind("Server", serverStub);

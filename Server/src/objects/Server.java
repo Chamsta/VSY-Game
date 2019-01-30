@@ -98,7 +98,7 @@ public class Server implements ServerInterface {
 		if(game == null) {
 			game = dbConnection.getGame(gameId);
 			String reg ="Game" + game.getId();
-			GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game,0);
+			GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game, Registry.REGISTRY_PORT);
 			registry.rebind(reg, gameStub);
 			mapGames.put(game.getId(), game);
 			System.out.println("Registered " + reg);
