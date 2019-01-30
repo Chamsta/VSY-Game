@@ -53,7 +53,7 @@ public class Main { //Server
 			IEcho objEcho = new Echo();
 			IEcho stubEcho = (IEcho) UnicastRemoteObject.exportObject(objEcho, portNumber);
 			
-			Server server = new Server(registry);
+			Server server = new Server(registry, portNumber);
 			if(loggoutAllUsers) {
 				Server.dbConnection.logoutAllUsers();
 				System.out.println("Alle User ausgeloggt.");

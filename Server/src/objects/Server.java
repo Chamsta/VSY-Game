@@ -16,10 +16,12 @@ public class Server implements IServer {
 	public static DBConnection dbConnection;
 	private static Registry registry;
 	private static HashMap<Integer, GameServer> mapGames = new HashMap<Integer, GameServer>();
+	private int Port;
 	
-	public Server(Registry registry) {
+	public Server(Registry registry, int port) {
 		Server.registry = registry;
 		dbConnection = new DBConnection();
+		this.Port = port;
 	}
 
 	/**
@@ -98,7 +100,7 @@ public class Server implements IServer {
 		if(game == null) {
 			game = dbConnection.getGame(gameId);
 			String reg ="Game" + game.getId();
-			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(game,0);
+			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(game,this.Port);
 			registry.rebind(reg, gameStub);
 			mapGames.put(game.getId(), game);
 			System.out.println("Registered " + reg);
