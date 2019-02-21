@@ -141,6 +141,7 @@ public class GameBoard {
 					String key = e.getActionCommand();
 					try {
 						setValue(key, game.setCell(key));
+						game.Play();
 					} catch (RemoteException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();

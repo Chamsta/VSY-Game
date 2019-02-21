@@ -253,9 +253,13 @@ public class GameServer implements IGame {
 		String key = String.format("%d,%d", positionX, positionY);
 		try {
 			Server.dbConnection.setCell(id, key, value);
+			if (checkForWin(positionX, positionY)){
+				Stop();
+			}
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage());
 		}
+		
 		checkGameEnd();
 		return value;
 	}

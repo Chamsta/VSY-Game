@@ -17,7 +17,7 @@ public class DBConnection {
 	public DBConnection(){
 		try{
 			if(connection == null || connection.isClosed())
-				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/vsygame?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "vsyuser", "vsyPasswort18!");
+				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/vsygame?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false", "vsyuser", "vsyPasswort18!");
 			this.statement = connection.createStatement();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
