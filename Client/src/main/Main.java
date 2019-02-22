@@ -25,7 +25,7 @@ public class Main { //Client
 		System.out.println(host);
         try {
             //Beim Starten aus Eclipse den vollstaendigen Pfad zu security.policy eingeben!
-//        	System.setProperty("java.security.policy", "security.policy");
+        	System.setProperty("java.security.policy", "security.policy");
         	System.setSecurityManager(new SecurityManager());
             Registry registry = LocateRegistry.getRegistry(host, Registry.REGISTRY_PORT);
             Echo stub = (Echo) registry.lookup("Echo");
@@ -50,7 +50,7 @@ public class Main { //Client
             GameInterface gameServer = (GameInterface) registry.lookup(reg);
             
             GameClient game = new GameClient(gameServer, user);
-            GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game, Registry.REGISTRY_PORT);
+            GameInterface gameStub = (GameInterface) UnicastRemoteObject.exportObject(game, 0);
             System.out.println("Register Client at Server");
             server.addClientGame(game.getId(), user, gameStub);
             System.out.println("Starting game");
