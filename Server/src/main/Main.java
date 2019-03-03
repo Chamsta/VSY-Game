@@ -50,7 +50,7 @@ public class Main { //Server
 			LocateRegistry.createRegistry(Registry.REGISTRY_PORT); 
 			registry = LocateRegistry.getRegistry();
 			
-			IEcho objEcho = new Echo();
+			Echo objEcho = new Echo();
 			IEcho stubEcho = (IEcho) UnicastRemoteObject.exportObject(objEcho, portNumber);
 			
 			Server server = new Server(registry, portNumber);
