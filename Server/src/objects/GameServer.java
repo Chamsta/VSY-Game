@@ -254,6 +254,7 @@ public class GameServer implements IGame {
 		try {
 			Server.dbConnection.setCell(id, key, value);
 			if (checkForWin(positionX, positionY)){
+				Server.dbConnection.setWinner(this.id, this.nextPlayer);
 				Stop();
 			}
 		} catch (Exception e) {
@@ -290,6 +291,7 @@ public class GameServer implements IGame {
 		String[] coordinate = key.split(",");
 		int posX = 0;
 		int posY = 0;
+		Boolean isSetted = false;
 		try{
 			if(coordinate.length == 2){
 				posX = Integer.valueOf(coordinate[0]);
@@ -306,8 +308,9 @@ public class GameServer implements IGame {
 		if(gameClient2 != null) {
 			gameClient2.setCell(key, value);
 		}
+		isSetted = this.setCell(posX, posY, value);
 		SwitchPlayer();
-		return this.setCell(posX, posY, value);
+		return isSetted;
 	}
 	
 	/**
@@ -501,6 +504,15 @@ public class GameServer implements IGame {
 		this.nextPlayer = getNextPlayer();
 		this.nextPlayer = this.nextPlayer.equals(this.player1) ? this.player2 : this.player1;
 		setNextPlayer(nextPlayer);
+	}
+
+	@Override
+	public String getWinner() throws RemoteException {
+		try {
+			return Server.dbConnection.getWinner(this.id);
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
 	}
 	
 }

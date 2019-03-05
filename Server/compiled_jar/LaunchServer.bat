@@ -1,1 +1,2 @@
-java -Djava.security.policy=security.policy -jar vsyServer.jar vom-wege.de
+java -Djava.security.policy=C:\Users\Douabalet\projectsHSNR\VSY-Game\Server\compiled_jar\security.policy -jar vsyServer.jar localhost
+pause

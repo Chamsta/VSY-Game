@@ -16,10 +16,15 @@ public class DBConnection {
 
 	public DBConnection(){
 		try{
+			Class.forName("com.mysql.cj.jdbc.Driver");
 			if(connection == null || connection.isClosed())
-				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/vsygame?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false", "vsyuser", "vsyPasswort18!");
+				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/vsygame?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false", "vsyuser", "vsyPasswort18!");
 			this.statement = connection.createStatement();
-		} catch (SQLException e) {
+			ResultSet rs = this.statement.executeQuery("SELECT version()");
+			if (rs.next()) {
+		        System.out.println("Test DB connection: Version ==> " + rs.getString(1));
+			}
+		} catch (SQLException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
@@ -230,6 +235,34 @@ public class DBConnection {
 			if(gameStatus == null)
 				return;
 			String query = "UPDATE game SET state=" + gameStatus.getNummer() + " WHERE id=" + gameId;
+			statement.execute(query);
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim setzen des Status.\n" + e.getMessage());
+		}
+	}
+
+	public String getWinner(int gameId) throws Exception {
+		try {
+			String query = "SELECT name FROM game "
+					+ "INNER JOIN player on winner = player.id WHERE game.id=" + gameId;
+			ResultSet rs = statement.executeQuery(query);
+			if(rs.next()) {
+				String winner = rs.getString(1);
+				if(!rs.wasNull())
+					return winner;
+			}
+			return null;
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim holen des Gewinners.\n" + e.getMessage());
+		}
+	}
+	
+	public void setWinner(int gameId, String currentPlayer) throws Exception {
+		try {
+			String idWinner = "NULL";
+			if(currentPlayer != null)
+				idWinner = String.valueOf(getUserId(currentPlayer));
+			String query = "UPDATE game SET winner=" + idWinner + " WHERE id=" + gameId;
 			statement.execute(query);
 		} catch (SQLException e) {
 			throw new Exception("Fehler beim setzen des Status.\n" + e.getMessage());

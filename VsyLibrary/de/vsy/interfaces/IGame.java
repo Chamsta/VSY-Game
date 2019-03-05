@@ -39,6 +39,11 @@ public interface IGame extends Remote, Serializable{
 	String getNextPlayer() throws RemoteException;
 
 	/**
+	 * @return the nextPlayer
+	 */
+	String getWinner() throws RemoteException;
+
+	/**
 	 * @param nextPlayer the nextPlayer to set
 	 */
 	void setNextPlayer(String nextPlayer) throws RemoteException;

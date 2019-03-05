@@ -70,6 +70,7 @@ public class GameClient implements IGame {
 	 */
 	@Override
 	public Boolean setCell(String key, String player) throws RemoteException {
+		if(this.getStatus() == GameStatus.Terminated) return false;
 		return this.gameServer.setCell(key, player);
 	}
 
@@ -159,6 +160,12 @@ public class GameClient implements IGame {
 	public void SwitchPlayer() throws RemoteException {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public String getWinner() throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

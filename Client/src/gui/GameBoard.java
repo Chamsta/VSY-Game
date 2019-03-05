@@ -178,8 +178,8 @@ public class GameBoard {
 		this.frame.setVisible(true);
 	}
 	
-	public void stop() {
-		labelWinner.setText("Ende");
+	public void stop() throws RemoteException {
+		labelWinner.setText("Ende: Winner => " + this.game.getWinner());
 	}
 	
 	public void setPlayer1(String player1) {

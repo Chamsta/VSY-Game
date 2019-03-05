@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import de.vsy.classes.tictactoe.ServerInfo;
 import de.vsy.interfaces.IEcho;
 import de.vsy.interfaces.IServer;
 import objects.Echo;
@@ -17,7 +18,7 @@ public class Main { //Server
 	private static int portNumber;
 	
 	public static void main(String[] args) {
-		System.out.println("Server startet. Wenn es mal programmiert wurde...");
+		System.out.println("Server starting...");
 		String host = (args.length < 1) ? null : args[0];
 		if(host == null){
 			System.out.println("Bitte Adresse des Servers beim Start angeben!");
@@ -36,12 +37,15 @@ public class Main { //Server
 		else{
 			portNumber = RMI_PORT_MIN;
 		}
-		boolean loggoutAllUsers = (args.length < 3) ? false : Boolean.valueOf(args[2]);
+		boolean loggoutAllUsers = (args.length < 3) ? true : Boolean.valueOf(args[2]);
 		System.out.println("Server startet auf Adresse: " + host);
 		try {
-			String serverPath = System.getProperty("user.dir") + "\\compiled_jar\\";
+			String serverPath = System.getProperty("user.dir");
 			if(!serverPath.toLowerCase().contains("compiled_jar")){
 				serverPath += serverPath.endsWith("\\") ? "compiled_jar\\" : "\\compiled_jar\\";
+			}
+			else{
+				serverPath += serverPath.endsWith("\\") ? "" : "\\";
 			}
         	//Beim Starten aus Eclipse den vollständigen Pfad zu security.policy eingeben!
 			System.setProperty("java.security.policy", serverPath + "security.policy");
@@ -51,6 +55,7 @@ public class Main { //Server
 			registry = LocateRegistry.getRegistry();
 			
 			Echo objEcho = new Echo();
+			objEcho.addServer(new ServerInfo("Server", portNumber));
 			IEcho stubEcho = (IEcho) UnicastRemoteObject.exportObject(objEcho, portNumber);
 			
 			Server server = new Server(registry, portNumber);
@@ -59,8 +64,8 @@ public class Main { //Server
 				System.out.println("Alle User ausgeloggt.");
 			}
 			IServer serverStub = (IServer) UnicastRemoteObject.exportObject(server, portNumber);
-
-            registry.bind("Echo", stubEcho);
+            
+			registry.bind("Echo", stubEcho);
             registry.bind("Server", serverStub);
             System.err.println("Server ready!");
         } catch (Exception e) {

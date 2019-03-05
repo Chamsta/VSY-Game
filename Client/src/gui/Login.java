@@ -21,7 +21,7 @@ public class Login {
 			return server;
 		
 		do{
-			server = JOptionPane.showInputDialog("Serveradresse eingeben", "vom-Wege.de");
+			server = JOptionPane.showInputDialog("Serveradresse eingeben", "localhost");
 		}while (server == null || server.isEmpty());
 		
 		return server;
