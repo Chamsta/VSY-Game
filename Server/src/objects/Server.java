@@ -5,7 +5,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dbconnect.DBConnection;
 import de.vsy.interfaces.IGame;
@@ -15,7 +15,7 @@ import de.vsy.interfaces.tictactoe.GameStatus;
 public class Server implements IServer {
 	public static DBConnection dbConnection;
 	private static Registry registry;
-	private static HashMap<Integer, GameServer> mapGames = new HashMap<Integer, GameServer>();
+	private static ConcurrentHashMap<Integer, GameServer> mapGames = new ConcurrentHashMap<Integer, GameServer>();
 	private int Port;
 	
 	public Server(Registry registry, int port) {
