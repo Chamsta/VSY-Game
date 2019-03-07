@@ -475,7 +475,8 @@ public class GameServer implements IGame {
 	public void Play() throws RemoteException{
 		if(this.player1 == null || this.player1.isEmpty() || this.player2 == null || this.player2.isEmpty())
 			return;
-		setNextPlayer(player1);
+		if(nextPlayer == null)
+			setNextPlayer(player1);
 		setStatus(GameStatus.Running);
 		checkGameEnd();
 	}

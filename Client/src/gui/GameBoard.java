@@ -146,6 +146,13 @@ public class GameBoard {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
+				} else {
+					try {
+						game.testConntection();
+					} catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 			}
 		};

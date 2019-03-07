@@ -1,11 +1,14 @@
 package objects;
 
 import java.rmi.AccessException;
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.List;
 
 import dbconnect.DBConnection;
 import de.vsy.interfaces.IGame;
@@ -16,12 +19,15 @@ public class Server implements IServer {
 	public static DBConnection dbConnection;
 	private static Registry registry;
 	private static HashMap<Integer, GameServer> mapGames = new HashMap<Integer, GameServer>();
-	private int Port;
+	private int port;
+	private String host;
 	
-	public Server(Registry registry, int port) {
+	public Server(Registry registry, String host, int port) throws Exception {
 		Server.registry = registry;
 		dbConnection = new DBConnection();
-		this.Port = port;
+		this.port = port;
+		this.host = host;
+		dbConnection.loginServer(host, port);
 	}
 
 	/**
@@ -100,7 +106,7 @@ public class Server implements IServer {
 		if(game == null) {
 			game = dbConnection.getGame(gameId);
 			String reg ="Game" + game.getId();
-			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(game,this.Port);
+			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(game,this.port);
 			registry.rebind(reg, gameStub);
 			mapGames.put(game.getId(), game);
 			System.out.println("Registered " + reg);
@@ -154,6 +160,46 @@ public class Server implements IServer {
 			game.setClientGame2(clientGame);
 		} else {
 			throw new RemoteException("Dieser Spieler ist nicht in dem Game vorhanden.");
+		}
+	}
+
+	@Override
+	public List<String> getServerList() throws RemoteException {
+		try {
+			return dbConnection.getServerlist();
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
+	}
+	
+	public void logout() throws Exception {
+		dbConnection.deleteServer(host, port);
+	}
+
+	@Override
+	public boolean ping() throws RemoteException {
+		return true;
+	}
+
+	@Override
+	public void checkServers() throws RemoteException {
+		try {
+			for(String address : dbConnection.getServerlist()) {
+				String host = address.split(":")[0];
+				int port = Integer.valueOf(address.split(":")[1]);
+				registry = LocateRegistry.getRegistry(host, port);
+				try {
+					if(registry.list().length != 0) {
+						IServer server = (IServer) registry.lookup("Server");
+							if(server.ping())
+								continue;
+					}
+				} catch (ConnectException e2) {
+					dbConnection.deleteServer(host, port);
+				}
+			}
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
 		}
 	}
 }

@@ -1,9 +1,14 @@
 package object;
 
+import java.rmi.ConnectException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
+import javax.crypto.spec.SecretKeySpec;
+
 import de.vsy.interfaces.IGame;
+import de.vsy.interfaces.IServer;
 import de.vsy.interfaces.tictactoe.GameStatus;
 import gui.GameBoard;
 
@@ -70,8 +75,14 @@ public class GameClient implements IGame {
 	 */
 	@Override
 	public Boolean setCell(String key, String player) throws RemoteException {
-		if(this.getStatus() == GameStatus.Terminated) return false;
-		return this.gameServer.setCell(key, player);
+		try {
+			if(this.getStatus() == GameStatus.Terminated) return false;
+			return this.gameServer.setCell(key, player);
+		} catch (ConnectException e) {
+			reconnect();
+			if(this.getStatus() == GameStatus.Terminated) return false;
+			return this.gameServer.setCell(key, player);
+		}
 	}
 
 	@Override
@@ -141,7 +152,13 @@ public class GameClient implements IGame {
 	 */
 	@Override
 	public void Play() throws RemoteException {
-		HashMap<String, Boolean> map = this.gameServer.getCells();
+		HashMap<String, Boolean> map = null;
+		try{
+			map = this.gameServer.getCells();
+		} catch (ConnectException e) {
+			reconnect();
+			map = this.gameServer.getCells();
+		}
 		for(String key : map.keySet()){
 			gameBoard.setValue(key, map.get(key));
 		}
@@ -166,5 +183,31 @@ public class GameClient implements IGame {
 	public String getWinner() throws RemoteException {
 		return gameServer.getWinner();
 	}
+	
+	public void testConntection() throws RemoteException {
+		try {
+			HashMap<String, Boolean> map = gameServer.getCells();
+			for(String key : map.keySet()){
+				gameBoard.setValue(key, map.get(key));
+			}
+		} catch (ConnectException e) {
+			reconnect();
+			HashMap<String, Boolean> map = gameServer.getCells();
+			for(String key : map.keySet()){
+				gameBoard.setValue(key, map.get(key));
+			}
+		}
+	}
 
+	private void reconnect() throws RemoteException {
+		try {
+			IServer	server = ServerFinder.getServer(null);
+			gameServer = ServerFinder.getGameServer(player);
+			UnicastRemoteObject.unexportObject(this, true);
+			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(this,0);
+			server.addClientGame(getId(), player, gameStub);
+		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
+	}
 }

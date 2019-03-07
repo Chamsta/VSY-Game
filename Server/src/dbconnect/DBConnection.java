@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import de.vsy.interfaces.tictactoe.GameStatus;
 import objects.GameServer;
@@ -326,6 +328,40 @@ public class DBConnection {
 			return null;
 		} catch (SQLException e) {
 			throw new Exception("Fehler beim holen des nächsten Spielers.\n" + e.getMessage());
+		}
+	}
+	
+	///////////////////////////// SERVER MANAGEMENT ///////////////////////////////////////////////////
+	public void loginServer(String host, int port)  throws Exception{
+		try {
+			String query = "INSERT IGNORE INTO serverliste (ip, port) VALUES ('" + host + "', " + port +")";
+			statement.execute(query);
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim anmelden des Servers." + e.getMessage());
+		}
+	}
+	
+	public List<String> getServerlist() throws Exception {
+		try {
+			String query = "SELECT ip, port FROM serverliste";
+			ResultSet rs = statement.executeQuery(query);
+			List<String> listServer = new ArrayList<String>();
+			while (rs.next()) {
+				String server = rs.getString(1) + ":" + rs.getString(2);
+				listServer.add(server);
+			}
+			return listServer;
+		} catch (Exception e) {
+			throw new Exception("Fehler beim Laden der Serverliste.");
+		}
+	}
+	
+	public void deleteServer(String host, int port) throws Exception {
+		try {
+			String query = "DELETE FROM serverliste WHERE ip='" + host + "' AND port=" + port;
+			statement.execute(query);
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim abmelden des Servers." + e.getMessage());
 		}
 	}
 }
