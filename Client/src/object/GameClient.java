@@ -164,8 +164,7 @@ public class GameClient implements IGame {
 
 	@Override
 	public String getWinner() throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		return gameServer.getWinner();
 	}
 
 }
