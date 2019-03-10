@@ -219,7 +219,7 @@ public class DBConnection {
 
 	public GameServer findWaitingGame(String user) throws Exception {
 		try {
-			String query = "SELECT game.id FROM game WHERE game.player2 IS NULL AND game.state = " + GameStatus.Waiting.getNummer();
+			String query = "SELECT game.id FROM game WHERE game.player2 IS NULL AND game.state = " + GameStatus.Waiting.getNummer() + " ORDER BY game.datetime ASC";
 			ResultSet rs = statement.executeQuery(query);
 			if(rs.next()){
 				int gameId = rs.getInt(1);
