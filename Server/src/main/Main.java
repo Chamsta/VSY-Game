@@ -48,7 +48,7 @@ public class Main { //Server
 				serverPath += serverPath.endsWith("\\") ? "" : "\\";
 			}
         	//Beim Starten aus Eclipse den vollständigen Pfad zu security.policy eingeben!
-			System.setProperty("java.security.policy", "security.policy");
+			System.setProperty("java.security.policy", serverPath + "security.policy");
 			System.setSecurityManager(new SecurityManager());
 			System.setProperty("java.rmi.server.hostname",host);
 			System.setProperty("java.rmi.server.logCalls", "true");

@@ -144,6 +144,8 @@ public class Server implements IServer {
 	private Integer findWaitingGame(String user) throws Exception {
 		GameServer game = dbConnection.findWaitingGame(user);
 		if(game != null) {
+			if(mapGames.containsKey(game.getId()))
+				game = mapGames.get(game.getId());
 			game.setPlayer2(user);
 			registerGame(game.getId());
 			return game.getId();
@@ -226,7 +228,8 @@ public class Server implements IServer {
 				informClients();
 			}
 		} catch (Exception e) {
-			throw new RemoteException(e.getMessage());
+			//throw new RemoteException(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	
