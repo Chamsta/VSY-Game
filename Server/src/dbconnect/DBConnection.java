@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.vsy.interfaces.tictactoe.GameStatus;
+import main.Main;
 import objects.GameServer;
 
 public class DBConnection {
@@ -362,6 +363,27 @@ public class DBConnection {
 			statement.execute(query);
 		} catch (SQLException e) {
 			throw new Exception("Fehler beim abmelden des Servers." + e.getMessage());
+		}
+	}
+	
+	public int getFreePort(String host) throws Exception {
+		try {
+			String query = "SELECT MAX(port), MIN(port) FROM serverliste WHERE ip = '" + host + "'";
+			ResultSet rs = statement.executeQuery(query);
+			if(rs.next()) {
+				int maxPort = rs.getInt(1);
+				int minPort = rs.getInt(2);
+				if(maxPort == 0) {
+					return Main.RMI_PORT_MIN;
+				}
+				if (minPort > Main.RMI_PORT_MIN) {
+					return Main.RMI_PORT_MIN;
+				}
+				return maxPort + 1;
+			}
+			return Main.RMI_PORT_MIN;
+		} catch (SQLException e) {
+			throw new Exception("Fehler beim laden des nächsten freien Ports");
 		}
 	}
 }

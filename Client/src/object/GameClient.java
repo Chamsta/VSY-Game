@@ -1,16 +1,21 @@
 package object;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.List;
 
-import javax.crypto.spec.SecretKeySpec;
+import javax.swing.SwingWorker;
+import javax.swing.Timer;
 
 import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.IServer;
 import de.vsy.interfaces.tictactoe.GameStatus;
 import gui.GameBoard;
+import gui.ReconnectWindow;
 
 public class GameClient implements IGame {
 	/**
@@ -22,6 +27,7 @@ public class GameClient implements IGame {
 	private String player;
 	int gameSize;
 	int id;
+	private Timer timer;
 	
 	public GameClient(IGame gameServer, String player) throws RemoteException{
 		this.gameServer = gameServer;
@@ -30,6 +36,7 @@ public class GameClient implements IGame {
 		this.id = gameServer.getId();
 		this.gameBoard = new GameBoard(gameSize, this);
 		this.gameBoard.setPlayer(player);
+		initReloadTimer();
 	}
 	
 	public boolean setCell(String key) throws RemoteException {
@@ -79,7 +86,7 @@ public class GameClient implements IGame {
 			if(this.getStatus() == GameStatus.Terminated) return false;
 			return this.gameServer.setCell(key, player);
 		} catch (ConnectException e) {
-			reconnect();
+			reconnectWithWindow();
 			if(this.getStatus() == GameStatus.Terminated) return false;
 			return this.gameServer.setCell(key, player);
 		}
@@ -156,7 +163,7 @@ public class GameClient implements IGame {
 		try{
 			map = this.gameServer.getCells();
 		} catch (ConnectException e) {
-			reconnect();
+			reconnectWithWindow();
 			map = this.gameServer.getCells();
 		}
 		for(String key : map.keySet()){
@@ -171,6 +178,7 @@ public class GameClient implements IGame {
 	@Override
 	public void Stop() throws RemoteException {
 		gameBoard.stop();
+		timer.stop();
 	}
 
 	@Override
@@ -191,14 +199,40 @@ public class GameClient implements IGame {
 				gameBoard.setValue(key, map.get(key));
 			}
 		} catch (ConnectException e) {
-			reconnect();
-			HashMap<String, Boolean> map = gameServer.getCells();
-			for(String key : map.keySet()){
-				gameBoard.setValue(key, map.get(key));
-			}
+			reconnectWithWindow();
+			Play();
 		}
 	}
 
+	private void reconnectWithWindow() throws RemoteException {
+//		ReconnectWindow reconnectWindow = new ReconnectWindow(gameBoard.getFrame());
+//		reconnectWindow.start();
+		reconnect();
+//		reconnectWindow.destroy();
+		/*
+		final ReconnectWindow reconnectWindow = new ReconnectWindow(gameBoard.getFrame());
+		SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
+			@Override
+			protected Void doInBackground() throws Exception {
+				publish(1);
+				reconnect();
+				return null;
+			}
+
+			@Override
+			protected void process(List<Integer> chunks) {
+				reconnectWindow.setVisible(true);
+			}
+
+			@Override
+			protected void done() {
+				reconnectWindow.dispose();
+			}
+		};
+		worker.execute();
+		*/
+	}
+	
 	private void reconnect() throws RemoteException {
 		try {
 			IServer	server = ServerFinder.getServer(null);
@@ -207,6 +241,37 @@ public class GameClient implements IGame {
 			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(this,0);
 			server.addClientGame(getId(), player, gameStub);
 		} catch (Exception e) {
+			throw new RemoteException(e.getMessage());
+		}
+	}
+	
+
+	public void initReloadTimer() {
+		timer = new Timer(3000, new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					gameServer.getStatus();
+				} catch (RemoteException e1) {
+					try {
+						reconnect();
+					} catch (RemoteException e2) {
+						e2.printStackTrace();
+					}
+				}
+			}
+		});
+		timer.start();
+	}
+
+	@Override
+	public void reloadServerList() throws RemoteException {
+		try {
+			ServerFinder.reloadServerList();
+		} catch (Exception e) {
+			if(e instanceof RemoteException)
+				throw (RemoteException)e;
 			throw new RemoteException(e.getMessage());
 		}
 	}

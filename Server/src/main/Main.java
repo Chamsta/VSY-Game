@@ -12,9 +12,8 @@ import objects.Server;
 
 
 public class Main { //Server
-	private static final int RMI_PORT_MIN = 2000;
+	public static final int RMI_PORT_MIN = 2000;
 	private static final int RMI_PORT_MAX = 49150;
-	private static Registry registry;
 	private static int portNumber;
 	
 	public static void main(String[] args) {
@@ -27,15 +26,15 @@ public class Main { //Server
 		if(args.length >= 2){
 			try {
 				portNumber = Integer.parseInt(args[1]);
-				if(portNumber < RMI_PORT_MIN && portNumber > RMI_PORT_MAX){
-					portNumber = RMI_PORT_MIN;
+				if(portNumber < RMI_PORT_MIN || portNumber > RMI_PORT_MAX){
+					portNumber = Server.getFreePort(host);
 				}
 			} catch (NumberFormatException e) {
-				portNumber = RMI_PORT_MIN;
+				portNumber = Server.getFreePort(host);
 			}
 		}
 		else{
-			portNumber = RMI_PORT_MIN;
+			portNumber = Server.getFreePort(host);
 		}
 		boolean loggoutAllUsers = (args.length < 3) ? true : Boolean.valueOf(args[2]);
 		System.out.println("Server startet auf Adresse: " + host + ":" + portNumber);
@@ -54,13 +53,14 @@ public class Main { //Server
 			System.setProperty("java.rmi.server.hostname",host);
 			System.setProperty("java.rmi.server.logCalls", "true");
 			
-			registry = LocateRegistry.createRegistry(portNumber);
+			Registry registry = LocateRegistry.createRegistry(portNumber);
 			
 			Echo objEcho = new Echo();
 			objEcho.addServer(new ServerInfo("Server", portNumber));
 			IEcho stubEcho = (IEcho) UnicastRemoteObject.exportObject(objEcho, portNumber);
 			
-			server = new Server(registry, host, portNumber);
+			server = new Server(host, portNumber);
+			server.checkServers();
 			if(loggoutAllUsers) {
 				Server.dbConnection.logoutAllUsers();
 				System.out.println("Alle User ausgeloggt.");

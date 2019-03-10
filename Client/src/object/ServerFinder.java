@@ -1,11 +1,15 @@
 package object;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.Timer;
 
 import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.IServer;
@@ -114,6 +118,7 @@ public class ServerFinder {
 	private static void initServerList(String host) throws Exception {
 		registry = findRegistry(host);
 		server = (IServer) registry.lookup("Server");
+		server.checkServers();
 		listServers = server.getServerList();
 	}
 
@@ -130,5 +135,14 @@ public class ServerFinder {
 			}
 		}
 		throw new Exception("Registry not found");
+	}
+	
+	public static void reloadServerList() throws Exception {
+		try {
+			listServers = server.getServerList();
+		} catch (ConnectException e) {
+			server = getServer(null);
+			listServers = server.getServerList();
+		}
 	}
 }

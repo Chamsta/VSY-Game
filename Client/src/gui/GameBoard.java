@@ -95,7 +95,7 @@ public class GameBoard {
 			public void windowClosing(WindowEvent e) {
 				try {
 					Main.logout();
-				} catch (RemoteException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -186,7 +186,10 @@ public class GameBoard {
 	}
 	
 	public void stop() throws RemoteException {
-		labelWinner.setText("Ende: Winner => " + this.game.getWinner());
+		if(this.game.getWinner() == null)
+			labelWinner.setText("Ende: No winner ");
+		else
+			labelWinner.setText("Ende: Winner => " + this.game.getWinner());
 	}
 	
 	public void setPlayer1(String player1) {
@@ -203,5 +206,9 @@ public class GameBoard {
 	
 	public void setPlayer(String player) {
 		frame.setTitle(player);
+	}
+	
+	public JFrame getFrame() {
+		return this.frame;
 	}
 }

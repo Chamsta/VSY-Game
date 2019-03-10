@@ -12,4 +12,5 @@ public interface IServer extends Remote{
 	List<String> getServerList() throws RemoteException;
 	boolean ping() throws RemoteException;
 	void checkServers() throws RemoteException;
+	void informClients() throws RemoteException;
 }

@@ -11,6 +11,9 @@ public class Login {
 		
 		do{
 			username = JOptionPane.showInputDialog("Benutzernamen eingeben");
+			if(username == null) {
+				System.exit(0);
+			}
 		}while (username == null || username.isEmpty());
 		
 		return username;
@@ -22,6 +25,9 @@ public class Login {
 		
 		do{
 			server = JOptionPane.showInputDialog("Serveradresse eingeben", "localhost");
+			if(server == null) {
+				System.exit(0);
+			}
 		}while (server == null || server.isEmpty());
 		
 		return server;

@@ -468,6 +468,14 @@ public class GameServer implements IGame {
 		this.gameClient2 = clientGame;
 	}
 	
+	public IGame getClientGame1 () {
+		return this.gameClient1;
+	}
+	
+	public IGame getClientGame2 () {
+		return this.gameClient2;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.vsy.classes.tictactoe.Game1#Play()
 	 */
@@ -513,6 +521,16 @@ public class GameServer implements IGame {
 			return Server.dbConnection.getWinner(this.id);
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void reloadServerList() throws RemoteException {
+		if(gameClient1 != null) {
+			gameClient1.reloadServerList();
+		}
+		if (gameClient2 != null) {
+			gameClient2.reloadServerList();
 		}
 	}
 	

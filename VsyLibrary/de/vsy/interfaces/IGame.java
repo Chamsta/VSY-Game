@@ -88,4 +88,10 @@ public interface IGame extends Remote, Serializable{
 	 * get the Id
 	 */
 	int getId() throws RemoteException;
+	
+	
+	/**
+	 * Server Management
+	 */
+	void reloadServerList() throws RemoteException;
 }

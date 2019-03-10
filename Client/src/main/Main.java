@@ -1,16 +1,13 @@
 package main;
 
+import java.rmi.ConnectException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
-import de.vsy.classes.tictactoe.ServerInfo;
-import de.vsy.interfaces.IEcho;
 import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.IServer;
 import gui.Login;
@@ -72,15 +69,26 @@ public class Main { //Client
             
             scan.close();
         } catch (Exception e) {
+        	if(server != null)
+				try {
+					server.logout(user);
+				} catch (RemoteException e1) {
+				}
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
             System.exit(0);
         }
 	}
 
-	public static void logout() throws RemoteException {
+	public static void logout() throws Exception {
+		server = ServerFinder.getServer(null);
 		if(server != null && user != null) {
-			server.logout(user);
+			try {
+				server.logout(user);				
+			} catch (ConnectException e) {
+				server = ServerFinder.getServer(null);
+				server.logout(user);
+			}
 		}
 	}
 }

@@ -14,18 +14,19 @@ import dbconnect.DBConnection;
 import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.IServer;
 import de.vsy.interfaces.tictactoe.GameStatus;
+import main.Main;
 
 public class Server implements IServer {
 	public static DBConnection dbConnection;
-	private static Registry registry;
 	private static HashMap<Integer, GameServer> mapGames = new HashMap<Integer, GameServer>();
-	private int port;
+	private static int port;
 	private String host;
 	
-	public Server(Registry registry, String host, int port) throws Exception {
-		Server.registry = registry;
-		dbConnection = new DBConnection();
-		this.port = port;
+	public Server(String host, int port) throws Exception {
+		if(dbConnection == null) {
+			dbConnection = new DBConnection();			
+		}
+		Server.port = port;
 		this.host = host;
 		dbConnection.loginServer(host, port);
 	}
@@ -75,11 +76,30 @@ public class Server implements IServer {
 	public void logout(String user) throws RemoteException {
 		try {
 			dbConnection.logoutUser(user);
+			removeFromGame(user);
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage());
 		}
 	}
 
+	private void removeFromGame(String user) throws RemoteException {
+		for(GameServer gameServer : mapGames.values()) {
+			boolean changed = false;
+			if(gameServer.getPlayer1().equals(user)) {
+				gameServer.setClientGame1(null);
+				changed = true;
+			}
+			if(gameServer.getPlayer2().equals(user)) {
+				gameServer.setClientGame2(null);
+				changed = true;
+			}
+			if(changed && gameServer.getClientGame1() == null && gameServer.getClientGame2() == null) {
+				UnicastRemoteObject.unexportObject(gameServer, true);
+				mapGames.remove(gameServer.getId());
+			}
+		}
+	}
+	
 	/**
 	 * Ein neues Spiel für den User wird erstellt und in der Datenbank angelegt.
 	 * @param user
@@ -106,7 +126,8 @@ public class Server implements IServer {
 		if(game == null) {
 			game = dbConnection.getGame(gameId);
 			String reg ="Game" + game.getId();
-			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(game,this.port);
+			IGame gameStub = (IGame) UnicastRemoteObject.exportObject(game, port);
+			Registry registry = LocateRegistry.getRegistry(port);
 			registry.rebind(reg, gameStub);
 			mapGames.put(game.getId(), game);
 			System.out.println("Registered " + reg);
@@ -136,6 +157,7 @@ public class Server implements IServer {
 	 */
 	public static void removeGame(int gameId) {
 		try {
+			Registry registry = LocateRegistry.getRegistry(port);
 			registry.unbind("Game" + gameId);
 		} catch (AccessException e) {
 			e.printStackTrace();
@@ -184,22 +206,45 @@ public class Server implements IServer {
 	@Override
 	public void checkServers() throws RemoteException {
 		try {
+			boolean serverDeleted = false;
 			for(String address : dbConnection.getServerlist()) {
 				String host = address.split(":")[0];
 				int port = Integer.valueOf(address.split(":")[1]);
-				registry = LocateRegistry.getRegistry(host, port);
+				Registry registry = LocateRegistry.getRegistry(host, port);
 				try {
 					if(registry.list().length != 0) {
 						IServer server = (IServer) registry.lookup("Server");
 							if(server.ping())
-								continue;
+								server.informClients();
 					}
 				} catch (ConnectException e2) {
 					dbConnection.deleteServer(host, port);
+					serverDeleted = true;
 				}
+			}
+			if(serverDeleted) {
+				informClients();
 			}
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public void informClients() throws RemoteException {
+		for(GameServer game : mapGames.values()) {
+			game.reloadServerList();
+		}
+	}
+	
+	public static int getFreePort(String host) {
+		if(dbConnection == null) {
+			dbConnection = new DBConnection();
+		}
+		try {
+			return dbConnection.getFreePort(host);
+		} catch (Exception e) {
+			return Main.RMI_PORT_MIN;
 		}
 	}
 }
