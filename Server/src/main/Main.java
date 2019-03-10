@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import de.vsy.classes.tictactoe.Helper;
 import de.vsy.classes.tictactoe.ServerInfo;
 import de.vsy.interfaces.IEcho;
 import de.vsy.interfaces.IServer;
@@ -47,6 +48,7 @@ public class Main { //Server
 			else{
 				serverPath += serverPath.endsWith("\\") ? "" : "\\";
 			}
+			serverPath = Helper.separatorsToSystem(serverPath);
         	//Beim Starten aus Eclipse den vollständigen Pfad zu security.policy eingeben!
 			System.setProperty("java.security.policy", serverPath + "security.policy");
 			System.setSecurityManager(new SecurityManager());

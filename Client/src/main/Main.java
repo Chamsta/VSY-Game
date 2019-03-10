@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
+import de.vsy.classes.tictactoe.Helper;
 import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.IServer;
 import gui.Login;
@@ -18,7 +19,7 @@ import object.ServerFinder;
 public class Main { //Client
 	private static IServer server;
 	private static String user;
-
+	
 	public static void main(String[] args) {
 		System.out.println("Ich bin dein Client.");
 		// Gets host
@@ -33,6 +34,7 @@ public class Main { //Client
 			else{
 				clientPath += clientPath.endsWith("\\") ? "" : "\\";
 			}
+			clientPath = Helper.separatorsToSystem(clientPath);
             System.setProperty("java.security.policy", clientPath + "security.policy");
         	System.setSecurityManager(new SecurityManager());
             // Gets remote server selected
