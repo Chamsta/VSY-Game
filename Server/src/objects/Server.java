@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -82,7 +83,8 @@ public class Server implements IServer {
 		}
 	}
 
-	private void removeFromGame(String user) throws RemoteException {
+	private synchronized void removeFromGame(String user) throws RemoteException {
+		List<Integer> listIdsToRemove = new ArrayList<Integer>();
 		for(GameServer gameServer : mapGames.values()) {
 			boolean changed = false;
 			if(gameServer.getPlayer1().equals(user)) {
@@ -95,8 +97,11 @@ public class Server implements IServer {
 			}
 			if(changed && gameServer.getClientGame1() == null && gameServer.getClientGame2() == null) {
 				UnicastRemoteObject.unexportObject(gameServer, true);
-				mapGames.remove(gameServer.getId());
+				listIdsToRemove.add(gameServer.getId());
 			}
+		}
+		for(int id : listIdsToRemove) {
+			mapGames.remove(id);
 		}
 	}
 	

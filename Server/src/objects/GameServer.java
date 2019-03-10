@@ -1,5 +1,6 @@
 package objects;
 
+import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
@@ -302,14 +303,22 @@ public class GameServer implements IGame {
 			posX = -1;
 			posY = -1;
 		}
-		if(gameClient1 != null) {
-			gameClient1.setCell(key, value);
-		}
-		if(gameClient2 != null) {
-			gameClient2.setCell(key, value);
-		}
 		isSetted = this.setCell(posX, posY, value);
 		SwitchPlayer();
+		if(gameClient1 != null) {
+			try {
+				gameClient1.setCell(key, value);
+			} catch (ConnectException e) {
+				System.err.println("Client 1 konnte nicht über setCell informiert werden.");
+			}
+		}
+		if(gameClient2 != null) {
+			try {
+				gameClient2.setCell(key, value);
+			} catch (ConnectException e) {
+				System.err.println("Client 2 konnte nicht über setCell informiert werden.");
+			}
+		}
 		return isSetted;
 	}
 	
@@ -370,10 +379,18 @@ public class GameServer implements IGame {
 			throw new RemoteException(e.getMessage());
 		}
 		if(gameClient1 != null){
-			gameClient1.setNextPlayer(this.nextPlayer);
+			try {
+				gameClient1.setNextPlayer(this.nextPlayer);
+			} catch (ConnectException e) {
+				System.err.println("Client 1 konnte nicht über setNextPlayer informiert werden.");
+			}
 		}
 		if(gameClient2 != null) {
-			gameClient2.setNextPlayer(this.nextPlayer);
+			try {
+				gameClient2.setNextPlayer(this.nextPlayer);
+			} catch (ConnectException e) {
+				System.err.println("Client 2 konnte nicht über setNextPlayer informiert werden.");
+			}
 		}
 	}
 
