@@ -52,7 +52,7 @@ public class DBConnection {
 	
 	public void loginUser(String username) throws Exception{
 		try {
-			String query = "INSERT INTO `player`(`name`, `loggedin`) VALUES ('" + username + "', 1) on DUPLICATE key update loggedin=1";
+			String query = "INSERT INTO `player`(`name`, `loggedin`) VALUES ('" + username.toLowerCase() + "', 1) on DUPLICATE key update loggedin=1";
 			statement.execute(query);
 		} catch (SQLException e) {
 			throw new Exception("Fehler beim login.\n" +e.getMessage());
@@ -61,7 +61,7 @@ public class DBConnection {
 	
 	public void logoutUser(String username) throws Exception {
 		try {
-			String query = "UPDATE `player` SET `loggedin`=0 WHERE name = '" + username + "'";
+			String query = "UPDATE `player` SET `loggedin`=0 WHERE name = '" + username.toLowerCase() + "'";
 			statement.execute(query);
 		} catch (SQLException e) {
 			throw new Exception("Fehler beim logout.\n" +e.getMessage());
@@ -70,7 +70,7 @@ public class DBConnection {
 	
 	public boolean isUserLoggedIn(String username) throws Exception {
 		try {
-			String query = "SELECT `loggedin` FROM player WHERE name = '" + username + "'";
+			String query = "SELECT `loggedin` FROM player WHERE name = '" + username.toLowerCase() + "'";
 			ResultSet rs = statement.executeQuery(query);
 			if(rs.next())
 				return rs.getBoolean(1);
@@ -93,7 +93,7 @@ public class DBConnection {
 		try {
 			String query = "SELECT game.id FROM game " 
 					+ "INNER JOIN player ON game.player1 = player.id OR game.player2 = player.id "
-					+ "WHERE player.name = '" + username + "' AND game.state IN (" + GameStatus.Running.getNummer() + ", " + GameStatus.Waiting.getNummer() + ")";
+					+ "WHERE player.name = '" + username.toLowerCase() + "' AND game.state IN (" + GameStatus.Running.getNummer() + ", " + GameStatus.Waiting.getNummer() + ")";
 			ResultSet rs = statement.executeQuery(query);
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -144,7 +144,7 @@ public class DBConnection {
 	
 	private int getUserId(String username) throws Exception{
 		try {
-			String query = "SELECT id FROM player WHERE name='" + username + "'";
+			String query = "SELECT id FROM player WHERE name='" + username.toLowerCase() + "'";
 			ResultSet rs = statement.executeQuery(query);
 			if(rs.next()){
 				return rs.getInt(1);
@@ -184,7 +184,7 @@ public class DBConnection {
 			String query = "UPDATE fieldvalue SET `value`=" +  val + " WHERE `key`='" + key + "' AND `gameid`='" + gameId + "'";
 			statement.execute(query);
 		} catch (SQLException e) {
-			throw new Exception("Fehler beim √§ndern eines Feldwertes.\n" + e.getMessage());
+			throw new Exception("Fehler beim ƒndern eines Feldwertes.\n" + e.getMessage());
 		}
 	}
 	
@@ -223,7 +223,7 @@ public class DBConnection {
 			ResultSet rs = statement.executeQuery(query);
 			if(rs.next()){
 				int gameId = rs.getInt(1);
-				query = "UPDATE game SET player2=(SELECT id FROM player WHERE name='" + user + "'), state=" + GameStatus.Running.getNummer() + " WHERE id=" + gameId;
+				query = "UPDATE game SET player2=(SELECT id FROM player WHERE name='" + user.toLowerCase() + "'), state=" + GameStatus.Running.getNummer() + " WHERE id=" + gameId;
 				statement.execute(query);
 				return getGame(gameId);
 			}
@@ -296,7 +296,7 @@ public class DBConnection {
 			}
 			return null;
 		} catch (SQLException e) {
-			throw new Exception("Fehler beim holen des n√§chsten Spielers.\n" + e.getMessage());
+			throw new Exception("Fehler beim holen des n‰chsten Spielers.\n" + e.getMessage());
 		}
 	}
 	
@@ -312,7 +312,7 @@ public class DBConnection {
 			}
 			return null;
 		} catch (SQLException e) {
-			throw new Exception("Fehler beim holen des n√§chsten Spielers.\n" + e.getMessage());
+			throw new Exception("Fehler beim holen des n‰chsten Spielers.\n" + e.getMessage());
 		}
 	}
 	
@@ -328,14 +328,14 @@ public class DBConnection {
 			}
 			return null;
 		} catch (SQLException e) {
-			throw new Exception("Fehler beim holen des n√§chsten Spielers.\n" + e.getMessage());
+			throw new Exception("Fehler beim holen des n‰chsten Spielers.\n" + e.getMessage());
 		}
 	}
 	
 	///////////////////////////// SERVER MANAGEMENT ///////////////////////////////////////////////////
 	public void loginServer(String host, int port)  throws Exception{
 		try {
-			String query = "INSERT IGNORE INTO serverliste (ip, port) VALUES ('" + host + "', " + port +")";
+			String query = "INSERT IGNORE INTO serverliste (ip, port) VALUES ('" + host.toLowerCase() + "', " + port +")";
 			statement.execute(query);
 		} catch (SQLException e) {
 			throw new Exception("Fehler beim anmelden des Servers." + e.getMessage());
@@ -359,7 +359,7 @@ public class DBConnection {
 	
 	public void deleteServer(String host, int port) throws Exception {
 		try {
-			String query = "DELETE FROM serverliste WHERE ip='" + host + "' AND port=" + port;
+			String query = "DELETE FROM serverliste WHERE ip='" + host.toLowerCase() + "' AND port=" + port;
 			statement.execute(query);
 		} catch (SQLException e) {
 			throw new Exception("Fehler beim abmelden des Servers." + e.getMessage());
@@ -368,7 +368,7 @@ public class DBConnection {
 	
 	public int getFreePort(String host) throws Exception {
 		try {
-			String query = "SELECT MAX(port), MIN(port) FROM serverliste WHERE ip = '" + host + "'";
+			String query = "SELECT MAX(port), MIN(port) FROM serverliste WHERE ip = '" + host.toLowerCase() + "'";
 			ResultSet rs = statement.executeQuery(query);
 			if(rs.next()) {
 				int maxPort = rs.getInt(1);
@@ -383,7 +383,7 @@ public class DBConnection {
 			}
 			return Main.RMI_PORT_MIN;
 		} catch (SQLException e) {
-			throw new Exception("Fehler beim laden des n√§chsten freien Ports");
+			throw new Exception("Fehler beim laden des n‰chsten freien Ports");
 		}
 	}
 }
