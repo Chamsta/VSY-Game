@@ -6,9 +6,21 @@ package de.vsy.interfaces.tictactoe;
  *
  */
 public enum GameStatus {
+	/**
+	 * The game status is unknown or the game is not initialize.
+	 */
 	None(1),
+	/**
+	 * The game is running.
+	 */
 	Running(2),
+	/**
+	 * The game is end.
+	 */
 	Terminated(3),
+	/**
+	 * The game is waiting for the second player to begin.
+	 */
 	Waiting(4);
 	
 	private final int nummer;
