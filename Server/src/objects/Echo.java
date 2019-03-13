@@ -11,6 +11,9 @@ import de.vsy.interfaces.IEcho;
 public class Echo implements IEcho {
 	private List<ServerInfo> servers;
 	
+	/**
+	 * The constructor.
+	 */
 	public Echo(){
 		this.servers = new ArrayList<ServerInfo>();
 	}
@@ -32,6 +35,9 @@ public class Echo implements IEcho {
 		return this.servers.toArray();
 	}
 
+	/**
+	 * Adds server.
+	 */
 	public void addServer(ServerInfo server) throws RemoteException {
 		this.servers.add(server);
 	}

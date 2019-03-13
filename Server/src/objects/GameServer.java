@@ -30,14 +30,17 @@ public class GameServer implements IGame {
 	private IGame gameClient2;
 	
 	/**
-	 * 
+	 * The constructor.
+	 * @param id The game identification.
 	 */
 	public GameServer(int id){
 		this(id, DEFAULT_GAME_SIZE);
 	}
 
 	/**
-	 * @param size
+	 * The constructor.
+	 * @param id The game identification.
+	 * @param size The game size.
 	 */
 	public GameServer(int id, int size){
 		this.id = id;
@@ -48,6 +51,9 @@ public class GameServer implements IGame {
 		this.winTimes = 0;
 	}
 	
+	/**
+	 * Sets the new identification.
+	 */
 	public void setId(int id){
 		this.id = id;
 	}
@@ -57,8 +63,11 @@ public class GameServer implements IGame {
 		return this.id;
 	}
 	
-	// Loop through all cells of the board and if one is found to be null then return false.
-    // Otherwise the board is full.
+	/**
+	 *  Loop through all cells of the board to check if there is a cell with null value.
+	 * @return false if one is found to be null, otherwise the board is full and return true.
+	 * @throws RemoteException
+	 */
 	public boolean isBoardFull() throws RemoteException {
         boolean isFull = true; 
         HashMap<String, Boolean> board = loadCells();
@@ -77,12 +86,23 @@ public class GameServer implements IGame {
         return isFull;
     }
 	 
-    // Check to see if all three values are the same (and not null) indicating a win.
+    /**
+     *  Check to see if all three values are the same (and not null) indicating a win.
+     * @param c1 The first cell.
+     * @param c2 The second cell.
+     * @param c3 The third cell.
+     * @return true if the three cells are same, otherwise false.
+     */
     private boolean checkRowCol(Boolean c1, Boolean c2, Boolean c3) {
         return ((c1 != null) && (c1 == c2) && (c2 == c3));
     }
      
-    // Loop through rows and see if any are winners.
+    /**
+     *  Loop through rows and see if any are winners.
+     * @param currentRow The current row that is setting.
+     * @return true if the two next cells line on the row are the same as this cell, otherwise false.
+     * @throws RemoteException
+     */
     private boolean checkRowsForWin(int currentRow) throws RemoteException { 
     	HashMap<String, Boolean> board = loadCells();
         int bLength = board.size();
@@ -96,7 +116,12 @@ public class GameServer implements IGame {
         return false;
     }
      
-    // Loop through columns and see if any are winners.
+    /**
+     *  Loop through columns and see if any are winners.
+     * @param currentCol The current column that is setting.
+     * @return true if the two next cells line on the column are the same as this cell, otherwise false.
+     * @throws RemoteException
+     */
     private boolean checkColumnsForWin(int currentCol) throws RemoteException {
     	HashMap<String, Boolean> board = loadCells();
         int bLength = board.size();
@@ -110,7 +135,13 @@ public class GameServer implements IGame {
         return false;
     }
  
-    // Check the two diagonals to see if either is a win. Return true if either wins.
+    /**
+     *  Check the two diagonals to see if either is a win. Return true if either wins.
+     * @param currentRow The current row that is setting.
+     * @param currentCol The current column that is setting.
+     * @return true if on one of this two diagonals there are directly cells line that are same.
+     * @throws RemoteException
+     */
     private boolean checkDiagonalsForWin(int currentRow, int currentCol) throws RemoteException {
     	HashMap<String, Boolean> board = loadCells();
         int bLength = board.size();
@@ -180,8 +211,13 @@ public class GameServer implements IGame {
     	return checked;
     }
     
-    // Returns true if there is a win, false otherwise.
-    // This calls our other win check functions to check the entire board.
+    /**
+     * Checks for game win.
+     * @param currentRow The current row that is setting.
+     * @param currentCol The current column that is setting.
+     * @return true if there is a winner, otherwise false.
+     * @throws RemoteException
+     */
     public boolean checkForWin(int currentRow, int currentCol) throws RemoteException {
         return ((checkRowsForWin(currentRow) || 
         			checkColumnsForWin(currentCol) || 
@@ -199,8 +235,8 @@ public class GameServer implements IGame {
 	}
 	
 	/**
-	 * LÃ¤dt die Cells zu dem Spiel aus der Datenbank.
-	 * @return
+	 * Lädt die Cells zu dem Spiel aus der Datenbank.
+	 * @return The cells list.
 	 * @throws RemoteException
 	 */
 	private HashMap<String, Boolean> loadCells() throws RemoteException {
@@ -267,7 +303,7 @@ public class GameServer implements IGame {
 	}
 	
 	/**
-	 * PrÃ¼f, ob das Spiel zu Ende ist (Spielfeld voll)
+	 * Prüf, ob das Spiel zu Ende ist (Spielfeld voll)
 	 * @throws RemoteException
 	 */
 	private void checkGameEnd() throws RemoteException {
@@ -344,6 +380,7 @@ public class GameServer implements IGame {
 	}
 
 	/**
+	 * Sets the game size.
 	 * @param gameSize the gameSize to set
 	 */
 	protected void setGameSize(int gameSize) {
@@ -466,6 +503,10 @@ public class GameServer implements IGame {
 		}
 	}
 	
+	/**
+	 * Clear the game matrix board.
+	 * @return
+	 */
 	public HashMap<String, Boolean> getInitCells(){
 		HashMap<String, Boolean> cells = new HashMap<String, Boolean>();
 		
