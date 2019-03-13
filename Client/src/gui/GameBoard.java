@@ -21,6 +21,9 @@ import java.awt.Font;
 import net.miginfocom.swing.MigLayout;
 import object.GameClient;
 
+/**
+ * The game board that shows the client game.
+ */
 public class GameBoard {
 
 	private JFrame frame;
@@ -34,7 +37,9 @@ public class GameBoard {
 	private JLabel labelWinner;
 
 	/**
-	 * Create the application.
+	 * Create the game board.
+	 * @param gameSize The game board size.
+	 * @param game The client game to set into the board.
 	 */
 	public GameBoard(int gameSize, GameClient game) {
 		this.gameSize = gameSize;
@@ -43,7 +48,7 @@ public class GameBoard {
 	}
 
 	/**
-	 * Initialize the contents of the frame.
+	 * Initialize the contents of the frame of game board.
 	 */
 	private void initialize() {
 		frame = new JFrame();
@@ -108,6 +113,10 @@ public class GameBoard {
 		});
 	}
 	
+	/**
+	 * creates the cells buttons on the board.
+	 * @param panelGame The panel game which will be inserted the cell buttons.
+	 */
 	private void addButtons(JPanel panelGame) {
 		mapButton = new HashMap<String, JButton>();
 		ActionListener action = getActionListener();
@@ -127,7 +136,7 @@ public class GameBoard {
 	}
 
 	/**
-	 * Der Actiopn Listener hängt an allen buttons und schickt dem Game welches Feld angeklickt wurde. 
+	 * Der Actiopn Listener h�ngt an allen buttons und schickt dem Game welches Feld angeklickt wurde. 
 	 * Das passiert nur, wenn die Variable myTurn == true ist.
 	 * @return
 	 */
@@ -161,8 +170,8 @@ public class GameBoard {
 	
 	/**
 	 * Schreibt ein X wenn @param value == true und für false ein O. Falls value null ist wird das Feld geleert.
-	 * @param key
-	 * @param value
+	 * @param key The key position on the board.
+	 * @param value The cell value to set.
 	 */
 	public void setValue(String key, Boolean value) {
 		JButton button = mapButton.get(key);
@@ -181,10 +190,16 @@ public class GameBoard {
 		this.myTurn = myTurn;
 	}
 	
+	/**
+	 * Shows the game window.
+	 */
 	public void start() {
 		this.frame.setVisible(true);
 	}
 	
+	/**
+	 * Stops the game and shows the winner name.
+	 */
 	public void stop() throws RemoteException {
 		if(this.game.getWinner() == null)
 			labelWinner.setText("Ende: No winner ");
@@ -192,22 +207,38 @@ public class GameBoard {
 			labelWinner.setText("Ende: Winner => " + this.game.getWinner());
 	}
 	
+	/**
+	 * Sets the first player name.
+	 */
 	public void setPlayer1(String player1) {
 		this.labelPlayer1.setText(player1);
 	}
 
+	/**
+	 * Sets the second player name.
+	 */
 	public void setPlayer2(String player2) {
 		this.labelPlayer2.setText(player2);
 	}
 	
+	/**
+	 * Sets the player name that plays next.
+	 */
 	public void setNextPlayer(String player) {
 		this.labelNext.setText(player);
 	}
 	
+	/**
+	 * Sets the player title.
+	 */
 	public void setPlayer(String player) {
 		frame.setTitle(player);
 	}
 	
+	/**
+	 * Gets the frame.
+	 * @return the current frame.
+	 */
 	public JFrame getFrame() {
 		return this.frame;
 	}

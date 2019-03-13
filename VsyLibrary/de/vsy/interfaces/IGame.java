@@ -22,7 +22,7 @@ public interface IGame extends Remote, Serializable{
 	 * Gets the cell value on specified position.
 	 * @param positionX The column position.
 	 * @param positionY The row position.
-	 * @return the cells
+	 * @return the cell value.
 	 */
 	Boolean getCell(int positionX, int positionY) throws RemoteException;
 
@@ -78,7 +78,7 @@ public interface IGame extends Remote, Serializable{
 
 	/**
 	 * Sets the next player.
-	 * @param nextPlayer the player name to set
+	 * @param nextPlayer the player name to set.
 	 */
 	void setNextPlayer(String nextPlayer) throws RemoteException;
 

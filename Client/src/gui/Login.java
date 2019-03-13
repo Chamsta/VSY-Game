@@ -2,9 +2,16 @@ package gui;
 
 import javax.swing.JOptionPane;
 
+/**
+ * The Login gui dialog to get the game parameters.
+ */
 public class Login {
 	private static String username;
 	private static String server;
+	
+	/**
+	 * Gets the input username to connect the client.
+	 */
 	public static String getUsername() {
 		if(username != null)
 			return username;
@@ -19,6 +26,9 @@ public class Login {
 		return username;
 	}
 	
+	/**
+	 * Gets the input server to connect the client.
+	 */
 	public static String getServer() {
 		if(server != null)
 			return server;

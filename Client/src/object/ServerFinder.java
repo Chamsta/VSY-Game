@@ -1,15 +1,11 @@
 package object;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.Timer;
 
 import de.vsy.interfaces.IGame;
 import de.vsy.interfaces.IServer;
@@ -23,6 +19,10 @@ public class ServerFinder {
 	private static Registry registry;
 	private static IGame gameServer;
 	
+	/**
+	 * Gets the remote server object.
+	 * @param initHost The remote hostname.
+	 */
 	public static IServer getServer(String initHost) throws Exception {
 		if(initHost != null) {
 			host = initHost;
@@ -62,6 +62,11 @@ public class ServerFinder {
 		throw new Exception("Keine Server verfügbar...");
 	}
 
+	/**
+	 * Gets the remote registry.
+	 * @param initHost The remote hostname.
+	 * @return The remote registry
+	 */
 	public static Registry getRegistry(String initHost) throws Exception {
 		if(initHost != null) {
 			host = initHost;
@@ -97,6 +102,11 @@ public class ServerFinder {
 		throw new Exception("Keine Server verfügbar...");
 	}
 	
+	/**
+	 * Gets the game object from remote server.
+	 * @param user The username for the game.
+	 * @return The game object.
+	 */
 	public static IGame getGameServer(String user) throws Exception {
 		try {
 			if(server.ping() && gameServer != null) {
@@ -115,6 +125,10 @@ public class ServerFinder {
         return gameServer;
 	}
 	
+	/**
+	 * Initialize the servers list from remote registry.
+	 * @param host The remote hostname.
+	 */
 	private static void initServerList(String host) throws Exception {
 		registry = findRegistry(host);
 		server = (IServer) registry.lookup("Server");
@@ -122,6 +136,10 @@ public class ServerFinder {
 		listServers = server.getServerList();
 	}
 
+	/**
+	 * Finds the registry on the remote server.
+	 * @param host The remote hostname.
+	 */
 	private static Registry findRegistry(String host) throws Exception {
 		Registry registry;
 		for(int port = RMI_PORT_MIN; port <= RMI_PORT_MAX; port++) {
@@ -137,6 +155,9 @@ public class ServerFinder {
 		throw new Exception("Registry not found");
 	}
 	
+	/**
+	 * Refreshes the servers list.
+	 */
 	public static void reloadServerList() throws Exception {
 		try {
 			listServers = server.getServerList();

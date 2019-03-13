@@ -17,10 +17,10 @@ import de.vsy.interfaces.tictactoe.GameStatus;
 import gui.GameBoard;
 import gui.ReconnectWindow;
 
+/**
+ * The client game.
+ */
 public class GameClient implements IGame {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7513278496760323195L;
 	private IGame gameServer;
 	private GameBoard gameBoard;
@@ -29,6 +29,11 @@ public class GameClient implements IGame {
 	int id;
 	private Timer timer;
 	
+	/**
+	 * The constructor.
+	 * @param gameServer The remote game object
+	 * @param player The player for this game.
+	 */
 	public GameClient(IGame gameServer, String player) throws RemoteException{
 		this.gameServer = gameServer;
 		this.gameSize = gameServer.getGameSize();
